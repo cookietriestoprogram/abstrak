@@ -21,6 +21,59 @@ const storageCollectionPicture = multer.diskStorage({
 
 const uploadRestaurantPicture = multer({ storage: storageCollectionPicture });
 
+const storageProductPicture = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, 'public/uploads/products/');
+  },
+  filename: function (req, file, cb) {
+      cb(null, file.originalname);
+  }
+});
+
+const uploadProductPicture = multer({ storage: storageProductPicture });
+
+router.put('/api/products/update/:id', uploadProductPicture.single('productPicture'), async (req, res) => {
+  try {
+      const { name, price, sku, materials, variations } = JSON.parse(req.body.product);
+      const productPicture = req.file ? req.file.filename : null;
+
+      const updatedProduct = await Product.findByIdAndUpdate(req.params.id, {
+          name,
+          price,
+          sku,
+          material: materials,
+          pictures: productPicture,
+          variations: variations
+      }, { new: true });
+
+      res.status(200).json({ message: 'Product updated successfully', product: updatedProduct });
+  } catch (error) {
+      res.status(500).json({ message: 'Error updating product', error });
+  }
+});
+
+router.put('/api/products/update/:id', uploadProductPicture.single('productPicture'), async (req, res) => {
+  try {
+      const { name, price, sku, materials, variations } = JSON.parse(req.body.product);
+      const productPicture = req.file ? req.file.filename : null;
+
+      const updatedProduct = await Product.findByIdAndUpdate(req.params.id, {
+          name,
+          price,
+          sku,
+          material: materials,
+          pictures: productPicture,
+          variations: variations
+      }, { new: true });
+
+      res.status(200).json({ message: 'Product updated successfully', product: updatedProduct });
+  } catch (error) {
+      res.status(500).json({ message: 'Error updating product', error });
+  }
+});
+
+
+module.exports = router;
 
 // collections page
 router.get(['/', '/collections'], handleCollectionPageRequest);
