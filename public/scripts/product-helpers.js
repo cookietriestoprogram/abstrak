@@ -1,5 +1,5 @@
 
-let tagList = [];
+let tagList, variations = [];
 let name, price, sku, materials, editingProductId;
 let initialProductDetails = {};
 
@@ -20,6 +20,12 @@ $(document).ready(function() {
     $(document).on('click', closePopup);
 });
 
+const ROW_VARIATION = '.product-form-variation'
+const ROW_STOCK = ".product-form-stock"
+const ROW_MANUCOST = ".product-form-manucost"
+
+
+
 function popupClick(event){
     event.stopPropagation(); // do not bubble up to the DOM window
     var $popup = $(this).closest('.container').find('.product-options-popup');
@@ -37,9 +43,14 @@ function displayUploadedImage(event) {
     var file = this.files[0];
     var reader = new FileReader();
     
+
     var mediaContainer = $(".main-picture");
     reader.onload = function(e) {
         mediaContainer.empty();  // Clear previous image
+
+    mediaContainer = $(".main-picture")
+    $(".product-photo-container").remove();
+    reader.onload = function(e){
         const photoContainer = document.createElement('div');
         photoContainer.className = 'product-photo-container';
 
@@ -54,6 +65,7 @@ function displayUploadedImage(event) {
     }
     
     reader.readAsDataURL(file);
+}
 }
 
 // Attach the event listener to the file input element
@@ -99,13 +111,25 @@ function validateProductName() {
     }
 }
 
-function validatePriceInput() {
-    if(Number($(this).val()) > 0) {
-        $('#product-price-input').removeClass('wrong-input').addClass('correct-input');
+function validateStockInput() {
+    const targetCell = $(this);
+    const value = Number(targetCell.val()); 
+
+    if (value >= 0) {
+        targetCell.removeClass('wrong-input').addClass('correct-input'); 
     } else {
-        $('#product-price-input').removeClass('correct-input').addClass('wrong-input');
+        targetCell.removeClass('correct-input').addClass('wrong-input'); 
     }
 }
+
+function validatePriceInput() {
+    if(Number($(this).val()) > 0) {
+        $(this).removeClass('wrong-input').addClass('correct-input');
+    } else {
+        $(this).removeClass('correct-input').addClass('wrong-input');
+    }
+}
+
 
 
 function validateSKUInput() {
@@ -153,11 +177,50 @@ function editProduct() {
     populateForm(editingProductId, productName, productPrice, productSku, productMaterials, productPicture);
     $('.add-product-modal').fadeIn();
 }
+
+
+function clearForm() {
+    toForm1Click();
+    $('.add-product-title').text('Add Product');
+    editingProductId = null;
+    $('#product-name-input').val('').removeClass('correct-input wrong-input');
+    $('#product-price-input').val('').removeClass('correct-input wrong-input');
+    $('#product-sku-input').val('').removeClass('correct-input wrong-input');
+    $('#material-list').empty();
+    tagList = [];
+    $('.main-picture img').remove();
+    $('<img>').attr('src', "/assets/upload-icon.png").attr('alt', "upload").attr('id', 'upload-icon').appendTo('.main-picture');
+    const variationContainer = $('.add-product-variation-rows');
+    variationContainer.empty(); // Remove all rows
+
+
+    const emptyRow = `
+        <div class="add-product-variation-row">
+            <input type="text" placeholder="Variation" class="product-form-variation table-type">
+            <input type="number" placeholder="Stock" class="product-form-stock table-type">
+            <input type="number" placeholder="Manufacturing Cost" class="product-form-manucost table-type">
+        </div>`;
+    variationContainer.append(emptyRow);
+}
+
+function preloadTag(tag) {
+    let tagElement = $('<div>').addClass('material').text(tag);
+    let removeButton = $('<span>').addClass('remove-material').text('×').click(function() {
+        let index = tagList.indexOf(tag);
+        if (index !== -1) {
+            tagList.splice(index, 1);
+        }
+        $(this).parent().remove();
+    });
+    tagElement.append(removeButton);
+    $('#material-list').append(tagElement);
+}
+
+
 function populateForm(id, name, price, sku, materials, picture) {
     $('#product-name-input').val(name).removeClass('correct-input wrong-input');
     $('#product-price-input').val(price).removeClass('correct-input wrong-input');
     $('#product-sku-input').val(sku).removeClass('correct-input wrong-input');
-    tagList.length = 0;
     tagList = materials;
     $('#material-list').empty();
     materials.forEach(material => preloadTag(material));
@@ -335,13 +398,10 @@ function nextForm(event){
     price = $('#product-price-input').val();
     sku = $('#product-sku-input').val();
     materials = tagList;
+    picture = $(".product-photo-container")
 
-    if(name === "" || price === "" || sku === "" || materials.length === 0){
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'Please fill out all fields!',
-        })
+    if(name === "" || price === "" || sku === "" || materials.length === 0 || picture.length === 0){
+        fireErrorSwal("Please fill out all fields and ensure that a picture is uploaded!")
         return;
     }
 
@@ -351,8 +411,11 @@ function nextForm(event){
     $("#back-form-button").show();
 }
 
-function submitProduct(event) {
-    event.preventDefault();
+function validateForm2(){
+    const uniqueVariations = []
+    const productVariations = []
+    const variations = $('.add-product-variation-row');
+
 
     const name = $('#product-name-input').val();
     const price = parseFloat($('#product-price-input').val());
@@ -360,11 +423,39 @@ function submitProduct(event) {
     const materials = $('#material-list').children().map(function() { return $(this).text(); }).get();
     const existingProductId = editingProductId;
 
+
+    for (let i = 0; i < variations.length; i++) {
+        const variation = {};
+        variation.variation = $(variations[i]).find(ROW_VARIATION).val();
+        variation.stocks = parseInt($(variations[i]).find(ROW_STOCK).val()); 
+        variation.manufacturingCost = parseFloat($(variations[i]).find(ROW_MANUCOST).val()); 
+
+        if (!variation.variation || variation.stocks < 0 || variation.manufacturingCost <= 0) {
+  
+            fireErrorSwal("Please fill out all fields and ensure that stock and manufacturing cost are valid numbers!")
+            return;
+        }
+
+        if(uniqueVariations.includes(variation.variation)){
+            fireErrorSwal("Variations must be unique!")
+            return;
+        }
+
+        uniqueVariations.push(variation.variation);
+        productVariations.push(variation);
+    }
+
+    return productVariations
+
+}
+
+function updateForm(name, price, sku, materials, existingProductId) {
+
     const product = {
         existingProductId: existingProductId,
         name: name,
         price: price,
-        sku: sku,
+        SKU: sku,
         material: materials,
         variations: []
     };
@@ -378,6 +469,12 @@ function submitProduct(event) {
     }
 
     formData.append('product', JSON.stringify(product));
+
+
+    const filename = $('#upload-icon').data('filename');
+    product.pictures = filename;
+
+
 
     const variations = $('.add-product-variation-row');
     let isValid = true;
@@ -395,6 +492,8 @@ function submitProduct(event) {
 
         product.variations.push(variation);
     }
+
+
 
     if (!isValid) {
         Swal.fire({
@@ -448,6 +547,73 @@ function submitProduct(event) {
             }
         });
     }
+    $.ajax({
+        url: `/api/products/update/${existingProductId}`,
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify(product),
+        success: function(response) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Product updated',
+                text: 'The product has been updated successfully.',
+                showConfirmButton: false // Hide the default "OK" button
+            });
+
+            // Close the modal after 3 seconds (for example)
+            setTimeout(() => {
+                Swal.close(); 
+                window.location.reload();
+            }, 1500);
+        },
+        error: function(xhr, status, error) {
+            Swal.fire('Error', 'There was an error updating the product.', 'error');
+        }
+    });
+
+}
+
+function submitProduct(event) {
+    event.preventDefault();
+
+    const name = $('#product-name-input').val();
+    const price = parseFloat($('#product-price-input').val()); // Convert price to float
+    const sku = $('#product-sku-input').val();
+    const material = $('#material-list').children().map(function() { return $(this).text().replace("×", ""); }).get();
+    const existingProductId = editingProductId;
+    const image = $("#imageInput")[0].files[0];
+    const collectionId = $('.main').data('id');
+
+    if (existingProductId) {
+        updateForm(name, price, sku, material, existingProductId);
+        return;
+    }
+
+    variations = validateForm2();
+    
+    console.log(variations);
+    console.log(material);
+
+    var formData = new FormData();
+    formData.append("name", name);
+    formData.append("price", price);
+    formData.append("SKU", sku);
+    formData.append("material", JSON.stringify(material));
+    formData.append("picture", image);
+    formData.append("variations", JSON.stringify(variations));
+    formData.append("collectionId", collectionId);
+
+
+    $.ajax({
+        url: '/api/products/add',
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function(data){
+            window.location.reload();
+        }
+    });
 }
 
 
@@ -470,5 +636,7 @@ function toForm2Click(event){
 function addVariation() {
     var newVariationRow = $('.add-product-variation-row:first').clone();
     newVariationRow.find('input').val('');
+    newVariationRow.find(ROW_STOCK).removeClass('wrong-input').removeClass('correct-input');
+    newVariationRow.find(ROW_MANUCOST).removeClass('wrong-input').removeClass('correct-input');
     $('.add-row-frame').append(newVariationRow);
 }
