@@ -32,6 +32,11 @@ router.delete('/api/products/delete/:id', deleteProductById);
 router.post('/api/products/check-name', checkName);
 router.post('/api/products/check-sku', checkSKU);
 router.get('/products/:id', fetchSizeStockCost);
+<<<<<<< Updated upstream
 router.put('/api/products/update/:id', updateProduct);
 
+=======
+router.put('/api/products/update/:id', uploadProductPicture.single('picture'), updateProduct);
+router.post('/api/products/add', uploadProductPicture.single('picture'), addProduct);
+>>>>>>> Stashed changes
 module.exports = router;

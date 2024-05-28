@@ -166,7 +166,6 @@ function populateForm(id, name, price, sku, materials, picture) {
     $('#product-name-input').val(name).removeClass('correct-input wrong-input');
     $('#product-price-input').val(price).removeClass('correct-input wrong-input');
     $('#product-sku-input').val(sku).removeClass('correct-input wrong-input');
-    tagList.length = 0;
     tagList = materials;
     $('#material-list').empty();
     materials.forEach(material => preloadTag(material));
@@ -305,14 +304,109 @@ function nextForm(event){
     $("#back-form-button").show();
 }
 
+<<<<<<< Updated upstream
+=======
+function validateForm2(){
+    const uniqueVariations = []
+    const productVariations = []
+    const variations = $('.add-product-variation-row');
+
+    for (let i = 0; i < variations.length; i++) {
+        const variation = {};
+        variation.variation = $(variations[i]).find(ROW_VARIATION).val();
+        variation.stocks = parseInt($(variations[i]).find(ROW_STOCK).val()); 
+        variation.manufacturingCost = parseFloat($(variations[i]).find(ROW_MANUCOST).val()); 
+
+        if (!variation.variation || variation.stocks < 0 || variation.manufacturingCost <= 0) {
+  
+            fireErrorSwal("Please fill out all fields and ensure that stock and manufacturing cost are valid numbers!")
+            return;
+        }
+
+        if(uniqueVariations.includes(variation.variation)){
+            fireErrorSwal("Variations must be unique!")
+            return;
+        }
+
+        uniqueVariations.push(variation.variation);
+        productVariations.push(variation);
+    }
+
+    return productVariations
+
+}
+
+function updateProduct(name, price, sku, material, existingProductId, image, collectionId)
+{
+    const product = {
+        existingProductId: existingProductId,
+        name: name,
+        price: price,
+        SKU: sku,
+        material: materials,
+        pictures: '',
+        variations: []
+    };
+
+    const filename = $('#upload-icon').data('filename');
+
+    // Assign the filename to the product object
+    product.pictures = filename;
+
+    const variations = $('.add-product-variation-row');
+    let isValid = true;
+
+    for (let i = 0; i < variations.length; i++) {
+        const variation = {};
+        variation.variation = $(variations[i]).find('.product-variation').val();
+        variation.stocks = parseInt($(variations[i]).find('.product-size').val()); 
+        variation.manufacturingCost = parseFloat($(variations[i]).find('.product-manu-cost').val()); 
+
+        if (!variation.variation || isNaN(variation.stocks) || isNaN(variation.manufacturingCost)) {
+            isValid = false;
+            break;
+        }
+
+        product.variations.push(variation);
+    }
+
+
+    // Update existing product
+    $.ajax({
+        url: `/api/products/update/${existingProductId}`,
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify(product),
+        success: function(response) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Product updated',
+                text: 'The product has been updated successfully.',
+                showConfirmButton: false // Hide the default "OK" button
+            });
+
+            // Close the modal after 3 seconds (for example)
+            setTimeout(() => {
+                Swal.close(); 
+                window.location.reload();
+            }, 5000);
+        },
+        error: function(xhr, status, error) {
+            Swal.fire('Error', 'There was an error updating the product.', 'error');
+        }
+    });
+}
+
+>>>>>>> Stashed changes
 function submitProduct(event) {
     event.preventDefault();
 
     const name = $('#product-name-input').val();
-    const price = parseFloat($('#product-price-input').val()); // Convert price to float
+    const price = parseFloat($('#product-price-input').val());
     const sku = $('#product-sku-input').val();
     const materials = $('#material-list').children().map(function() { return $(this).text(); }).get();
     const existingProductId = editingProductId;
+<<<<<<< Updated upstream
 
 
     const product = {
@@ -385,6 +479,36 @@ function submitProduct(event) {
             }
         });
     }
+=======
+    const image = $("#imageInput")[0].files[0];
+    const collectionId = $('.main').data('id');
+
+    if (existingProductId) {
+        updateProduct(name, price, sku, material, existingProductId, image, collectionId);
+        return;
+    }
+
+    variations = validateForm2();
+
+    var formData = new FormData();
+    formData.append("name", name);
+    formData.append("price", price);
+    formData.append("SKU", sku);
+    formData.append("material", JSON.stringify(material));
+    formData.append("picture", image);
+    formData.append("variations", JSON.stringify(variations));
+    formData.append("collectionId", collectionId);
+    $.ajax({
+        url: '/api/products/add',
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function(data){
+            window.location.reload();
+        }
+    });
+>>>>>>> Stashed changes
 
     console.log(product);
 }

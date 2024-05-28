@@ -71,8 +71,8 @@ async function fetchSizeStockCost(req, res) {
   }
 }
 
-async function updateProduct(req, res) {
-  const productId = req.params.id;
+async function updateProduct (req, res) {
+    const productId = req.params.id;
   const productData = req.body;
 
   try {
@@ -89,6 +89,7 @@ async function updateProduct(req, res) {
       res.status(500).json({ error: 'Error updating product' });
   }
 }
+  
 
 
 
