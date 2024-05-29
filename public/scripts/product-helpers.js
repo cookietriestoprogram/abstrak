@@ -212,10 +212,19 @@ function populateForm(id, name, price, sku, materials, picture) {
         price: price,
         sku: sku,
         materials: [...materials],
+<<<<<<< Updated upstream
         picture: picture
     };
 
     fetchProductData(id);
+=======
+        picture: picture,
+        variations: []
+    };
+
+    fetchProductData(id);
+    createImage(picture);
+>>>>>>> Stashed changes
 }
 
 function fetchProductData(productId) {
@@ -226,6 +235,14 @@ function fetchProductData(productId) {
             console.log(response.variations);
             $('.add-product-variation-rows').empty();
 
+            // Update initialProductDetails.variations with fetched variations
+            initialProductDetails.variations = response.variations.map(variation => ({
+                variation: variation.variation,
+                stocks: variation.stocks,
+                manufacturingCost: variation.manufacturingCost
+            }));
+
+            // Populate the form with fetched variations
             response.variations.forEach(variation => {
                 let newRow = $('<div>').addClass('add-product-variation-row');
                 
@@ -406,6 +423,7 @@ function updateForm(name, price, sku, materials, existingProductId) {
         return;
     }
 
+<<<<<<< Updated upstream
     const hasChanges = (
         name !== initialProductDetails.name ||
         price !== initialProductDetails.price ||
@@ -446,7 +464,54 @@ function updateForm(name, price, sku, materials, existingProductId) {
             Swal.fire('Error', 'There was an error updating the product.', 'error');
         }
     });
+=======
+    console.log("Initial product details:", initialProductDetails);
+    console.log("Current product details:", product);
+
+    const hasChanges = (
+        name !== initialProductDetails.name ||
+        price !== initialProductDetails.price ||
+        sku !== initialProductDetails.sku ||
+        JSON.stringify(materials) !== JSON.stringify(initialProductDetails.materials) ||
+        JSON.stringify(product.variations) !== JSON.stringify(initialProductDetails.variations)
+    );
+
+    if (!hasChanges) {
+        Swal.fire({
+            icon: 'info',
+            title: 'No changes made',
+            text: 'No changes were made to the product.',
+        });
+    } else {
+        $.ajax({
+            url: `/api/products/update/${existingProductId}`,
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(product),
+            success: function(response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Product updated',
+                    text: 'The product has been updated successfully.',
+                    showConfirmButton: false // Hide the default "OK" button
+                });
+
+                // Close the modal after 3 seconds (for example)
+                setTimeout(() => {
+                    Swal.close(); 
+                    window.location.reload();
+                }, 10000);
+            },
+            error: function(xhr, status, error) {
+                Swal.fire('Error', 'There was an error updating the product.', 'error');
+            }
+        });
+    }
+>>>>>>> Stashed changes
 }
+
+
+
 
 function submitProduct(event) {
     event.preventDefault();
