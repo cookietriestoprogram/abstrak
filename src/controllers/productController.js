@@ -97,22 +97,36 @@ async function fetchSizeStockCost(req, res) {
 }
 
 async function updateProduct(req, res) {
-  const productId = req.params.id;
-  const productData = req.body;
+    const productId = req.params.id;
+    const { name, price, SKU, material, variations } = req.body;
 
-  try {
-      // Find the product by ID and update its details
-      const updatedProduct = await Product.findByIdAndUpdate(productId, productData, { new: true });
+    try {
+        let picture = req.body.picture; 
 
-      if (!updatedProduct) {
-          return res.status(404).json({ error: 'Product not found' });
-      }
+        if (req.file) {
+            picture = `/uploads/products/${req.file.filename}`;
+        }
 
-      res.json(updatedProduct); // Return the updated product
-  } catch (error) {
-      console.error('Error updating product:', error);
-      res.status(500).json({ error: 'Error updating product' });
-  }
+        const productData = {
+            name,
+            price,
+            SKU,
+            material: JSON.parse(material),
+            variations: JSON.parse(variations),
+            picture
+        };
+
+        const updatedProduct = await Product.findByIdAndUpdate(productId, productData, { new: true });
+
+        if (!updatedProduct) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+
+        res.json(updatedProduct); 
+    } catch (error) {
+        console.error('Error updating product:', error);
+        res.status(500).json({ error: 'Error updating product' });
+    }
 }
 
 

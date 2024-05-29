@@ -3,23 +3,6 @@ let tagList, variations = [];
 let name, price, sku, materials, editingProductId;
 let initialProductDetails = {};
 
-// added because some buttons dont work 
-$(document).ready(function() {
-    $('#imageInput').on('change', displayUploadedImage);
-    $('#next-form-button').on('click', toForm2Click);
-    $('#back-form-button').on('click', toForm1Click);
-    $('#product-name-input').on('input', validateProductName);
-    $('#product-price-input').on('input', validatePriceInput);
-    $('#product-sku-input').on('input', validateSKUInput);
-    $('#product-material-input').on('keypress', listenToTagEntry);
-    
-    $('.add-product-variation-row .add-variation').on('click', addVariation);
-    $('.delete-product').on('click', deleteProduct);
-    $('.edit-product').on('click', editProduct);
-    
-    $(document).on('click', closePopup);
-});
-
 const ROW_VARIATION = '.product-form-variation'
 const ROW_STOCK = ".product-form-stock"
 const ROW_MANUCOST = ".product-form-manucost"
@@ -42,15 +25,11 @@ function closePopup(event){
 function displayUploadedImage(event) {
     var file = this.files[0];
     var reader = new FileReader();
-    
 
-    var mediaContainer = $(".main-picture");
     reader.onload = function(e) {
-        mediaContainer.empty();  // Clear previous image
+        var mediaContainer = $(".main-picture");
+        mediaContainer.empty(); // Clear previous image
 
-    mediaContainer = $(".main-picture")
-    $(".product-photo-container").remove();
-    reader.onload = function(e){
         const photoContainer = document.createElement('div');
         photoContainer.className = 'product-photo-container';
 
@@ -60,18 +39,10 @@ function displayUploadedImage(event) {
         photoContainer.appendChild(img);
 
         mediaContainer.append(photoContainer);
-        
-        $('#imageInput').val('');
-    }
-    
+    };
+
     reader.readAsDataURL(file);
 }
-}
-
-// Attach the event listener to the file input element
-$(document).ready(function() {
-    $('#imageInput').on('change', displayUploadedImage);
-});
 
 
 
@@ -86,7 +57,25 @@ function listenToTagEntry(event) {
     }
 }
 
+function addTag(tag) {
+    if (tagList.includes(tag)) {
+        console.log('Tag already exists:', tag);
+        return;
+    }
 
+    tagList.push(tag);
+
+    var tagElement = $('<div>').addClass('material').text(tag);
+    var removeButton = $('<span>').addClass('remove-material').text('×').click(function() {
+        var index = tagList.indexOf(tag);
+        if (index !== -1) {
+            tagList.splice(index, 1);
+        }
+        $(this).parent().remove();
+    });
+    tagElement.append(removeButton);
+    $('#material-list').append(tagElement);
+}
 
 function validateProductName() {
     const name = $(this).val();
@@ -153,7 +142,6 @@ function validateSKUInput() {
     }
 }
 
-
 function editProduct() {
     event.preventDefault();
     $('.add-product-title').text('Edit Product');
@@ -166,18 +154,9 @@ function editProduct() {
     const productMaterials = $container.data('materials').split(',');
     const productPicture = $container.data('picture');
 
-    initialProductDetails = {
-        name: productName,
-        price: productPrice,
-        sku: productSku,
-        materials: [...productMaterials],
-        picture: productPicture
-    };
-
     populateForm(editingProductId, productName, productPrice, productSku, productMaterials, productPicture);
     $('.add-product-modal').fadeIn();
 }
-
 
 function clearForm() {
     toForm1Click();
@@ -225,69 +204,19 @@ function populateForm(id, name, price, sku, materials, picture) {
     $('#material-list').empty();
     materials.forEach(material => preloadTag(material));
 
-    console.log(tagList);
     $('.main-picture img').remove();
+    $('<img>').attr('src', picture).attr('alt', name).appendTo('.main-picture');
+
+    initialProductDetails = {
+        name: name,
+        price: price,
+        sku: sku,
+        materials: [...materials],
+        picture: picture
+    };
 
     fetchProductData(id);
-
-    $('<img>').attr('src', picture).attr('alt', name).appendTo('.main-picture');
 }
-
-function clearForm() {
-    $('.add-product-title').text('Add Product');
-    editingProductId = null;
-    $('#product-name-input').val('').removeClass('correct-input wrong-input');
-    $('#product-price-input').val('').removeClass('correct-input wrong-input');
-    $('#product-sku-input').val('').removeClass('correct-input wrong-input');
-    $('#material-list').empty();
-    tagList = [];
-    $('.main-picture img').remove();
-    $('<img>').attr('src', "/assets/upload-icon.png").attr('alt', "upload").attr('id', 'upload-icon').appendTo('.main-picture');
-}
-
-function addTag(tag) {
-    if (tagList.includes(tag)) {
-        console.log('Tag already exists:', tag);
-        return;
-    }
-
-    tagList.push(tag);
-
-    var tagElement = $('<div>').addClass('material');
-    var tagText = $('<span>').text(tag);
-    var removeButton = $('<span>').addClass('remove-material').text('×').click(function() {
-        var index = tagList.indexOf(tag);
-        if (index !== -1) {
-            tagList.splice(index, 1);
-        }
-        $(this).parent().remove();
-    });
-
-    // Append the tag text and remove button to the tag element
-    tagElement.append(tagText).append(removeButton);
-    $('#material-list').append(tagElement);
-}
-
-function preloadTag(tag) {
-    // Check if the tag already exists in the DOM
-    if ($('#material-list').find('.material > span').filter(function() { 
-        return $(this).text() === tag; 
-    }).length === 0) {
-        let tagElement = $('<div>').addClass('material');
-        let tagText = $('<span>').text(tag);
-        let removeButton = $('<span>').addClass('remove-material').text('×').click(function() {
-            let index = tagList.indexOf(tag);
-            if (index !== -1) {
-                tagList.splice(index, 1);
-            }
-            $(this).parent().remove();
-        });
-
-        tagElement.append(tagText).append(removeButton);
-        $('#material-list').append(tagElement);
-    }
-}
-
 
 function fetchProductData(productId) {
     $.ajax({
@@ -416,14 +345,6 @@ function validateForm2(){
     const productVariations = []
     const variations = $('.add-product-variation-row');
 
-
-    const name = $('#product-name-input').val();
-    const price = parseFloat($('#product-price-input').val());
-    const sku = $('#product-sku-input').val();
-    const materials = $('#material-list').children().map(function() { return $(this).text(); }).get();
-    const existingProductId = editingProductId;
-
-
     for (let i = 0; i < variations.length; i++) {
         const variation = {};
         variation.variation = $(variations[i]).find(ROW_VARIATION).val();
@@ -450,7 +371,6 @@ function validateForm2(){
 }
 
 function updateForm(name, price, sku, materials, existingProductId) {
-
     const product = {
         existingProductId: existingProductId,
         name: name,
@@ -460,40 +380,22 @@ function updateForm(name, price, sku, materials, existingProductId) {
         variations: []
     };
 
-    const fileInput = document.getElementById('imageInput');
-    const file = fileInput.files[0];
-    const formData = new FormData();
+    const variations = $('.add-product-variation-row').map(function() {
+        return {
+            variation: $(this).find('.product-variation').val(),
+            stocks: parseInt($(this).find('.product-size').val()), 
+            manufacturingCost: parseFloat($(this).find('.product-manu-cost').val())
+        };
+    }).get();
 
-    if (file) {
-        formData.append('productPicture', file);
-    }
-
-    formData.append('product', JSON.stringify(product));
-
-
-    const filename = $('#upload-icon').data('filename');
-    product.pictures = filename;
-
-
-
-    const variations = $('.add-product-variation-row');
     let isValid = true;
-
-    for (let i = 0; i < variations.length; i++) {
-        const variation = {};
-        variation.variation = $(variations[i]).find('.product-variation').val();
-        variation.stocks = parseInt($(variations[i]).find('.product-size').val());
-        variation.manufacturingCost = parseFloat($(variations[i]).find('.product-manu-cost').val());
-
+    for (let variation of variations) {
         if (!variation.variation || isNaN(variation.stocks) || isNaN(variation.manufacturingCost)) {
             isValid = false;
             break;
         }
-
         product.variations.push(variation);
     }
-
-
 
     if (!isValid) {
         Swal.fire({
@@ -515,38 +417,12 @@ function updateForm(name, price, sku, materials, existingProductId) {
     if (!hasChanges) {
         Swal.fire({
             icon: 'info',
-            title: 'No changes',
+            title: 'No changes made',
             text: 'No changes were made to the product.',
         });
-    } else {
-        const url = existingProductId ? `/api/products/update/${existingProductId}` : '/api/products/add';
-        const method = existingProductId ? 'PUT' : 'POST';
-
-        $.ajax({
-            url: url,
-            method: method,
-            processData: false,
-            contentType: false,
-            data: formData,
-            success: function(response) {
-                Swal.fire({
-                    icon: 'success',
-                    title: existingProductId ? 'Product updated' : 'Product added',
-                    text: existingProductId ? 'The product has been updated successfully.' : 'The product has been added successfully.',
-                    showConfirmButton: false
-                });
-
-                setTimeout(() => {
-                    Swal.close();
-                    $('.form-2').hide();
-                    window.location.reload();
-                }, 5000);
-            },
-            error: function(xhr, status, error) {
-                Swal.fire('Error', 'There was an error saving the product.', 'error');
-            }
-        });
+        return;
     }
+
     $.ajax({
         url: `/api/products/update/${existingProductId}`,
         method: 'PUT',
@@ -570,7 +446,6 @@ function updateForm(name, price, sku, materials, existingProductId) {
             Swal.fire('Error', 'There was an error updating the product.', 'error');
         }
     });
-
 }
 
 function submitProduct(event) {
@@ -616,8 +491,12 @@ function submitProduct(event) {
     });
 }
 
+$(document).ready(function() {
+    $('#imageInput').on('change', displayUploadedImage);
+    $('#next-form-button').on('click', toForm2Click);
+    $('#back-form-button').on('click', toForm1Click);
 
-
+});
 
 function toForm1Click(event){
     $(".form-1").show();
@@ -640,3 +519,5 @@ function addVariation() {
     newVariationRow.find(ROW_MANUCOST).removeClass('wrong-input').removeClass('correct-input');
     $('.add-row-frame').append(newVariationRow);
 }
+
+
