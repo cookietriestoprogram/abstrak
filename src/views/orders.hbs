@@ -27,9 +27,8 @@
                         <th>Fulfillment Status</th>
                         <th>Payment Status</th>
                         <th>Total</th>
-                        <th>Items</th>
                         <th>Shipping Rate</th>
-                        <th>Delivery Method</th>
+                        <th>Ordered From</th>
                     </tr>
                 </thead>
                 <tbody id="orders-body">
@@ -42,13 +41,6 @@
                             <td>{{fulfillmentStatus}}</td>
                             <td>{{paymentStatus}}</td>
                             <td>{{total}}</td>
-                            <td>
-                                <ul>
-                                    {{#each items}}
-                                        <li>{{this.itemName}} - {{this.quantity}} ({{this.variant}}), SKU: {{this.sku}}, Price: {{this.price}}</li>
-                                    {{/each}}
-                                </ul>
-                            </td>
                             <td>{{shippingRate}}</td>
                             <td>{{deliveryMethod}}</td>
                         </tr>
@@ -188,15 +180,6 @@
                     const total = order.total ? `₱${order.total}` : 'N/A';
                     const shippingRate = order.shippingRate || 'N/A';
                     const deliveryMethod = order.deliveryMethod || 'N/A';
-                    const items = order.items && Array.isArray(order.items)
-                        ? order.items.map((item, index) => `
-                            <b>Item Name:</b> ${item.itemName}<br>
-                            <b>SKU:</b> ${item.sku}<br>
-                            <b>Quantity:</b> ${item.quantity}<br>
-                            <b>Price:</b> ₱${item.price}<br>
-                        `).join('<br>')
-                        : 'No items';
-
                     const tr = document.createElement('tr');
                     tr.classList.add('orders-row');
                     tr.innerHTML = `
@@ -207,7 +190,6 @@
                         <td>${fulfillmentStatus}</td>
                         <td>${paymentStatus}</td>
                         <td>${total}</td>
-                        <td>${items}</td>
                         <td>${shippingRate}</td>
                         <td>${deliveryMethod}</td>
                     `;
