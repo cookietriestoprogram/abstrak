@@ -60,6 +60,7 @@ const orderSchema = new Schema({
   trackingNumber: String,
   fulfillmentService: String,
   deliveryMethod: String,
+  orderedFrom: String,
   shippingLabel: String,
 });
 

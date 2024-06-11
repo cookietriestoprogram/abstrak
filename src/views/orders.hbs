@@ -42,7 +42,7 @@
                             <td>{{paymentStatus}}</td>
                             <td>{{total}}</td>
                             <td>{{shippingRate}}</td>
-                            <td>{{deliveryMethod}}</td>
+                            <td>{{orderedFrom}}</td>
                         </tr>
                     {{/each}}
                 </tbody>
@@ -179,7 +179,7 @@
                     const paymentStatus = order.paymentStatus || 'N/A';
                     const total = order.total ? `₱${order.total}` : 'N/A';
                     const shippingRate = order.shippingRate || 'N/A';
-                    const deliveryMethod = order.deliveryMethod || 'N/A';
+                    const orderedFrom = order.orderedFrom || 'N/A';
                     const tr = document.createElement('tr');
                     tr.classList.add('orders-row');
                     tr.innerHTML = `
@@ -191,7 +191,7 @@
                         <td>${paymentStatus}</td>
                         <td>${total}</td>
                         <td>${shippingRate}</td>
-                        <td>${deliveryMethod}</td>
+                        <td>${orderedFrom}</td>
                     `;
                     tbody.appendChild(tr);
                 });
