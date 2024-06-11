@@ -30,7 +30,6 @@ const itemSchema = new Schema({
   weight: Number,
   customText: String,
   depositAmount: Number,
-  deliveryMethod: String,
   deliveryTime: String,
 });
 
@@ -73,6 +72,7 @@ const orderSchema = new Schema({
   fulfillmentStatus: String,
   trackingNumber: String,
   fulfillmentService: String,
+  deliveryMethod: String,
   shippingLabel: String,
 });
 

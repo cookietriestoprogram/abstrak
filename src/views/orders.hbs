@@ -6,13 +6,17 @@
     <title>Orders</title>
     <link rel="stylesheet" href="/styles/orders.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="/node_modules/three-dots/dist/three-dots.min.css">
+    <script src="/scripts/orders.js"></script>
+
 </head>
 <body>
     <div class="main">
         {{>navbar}}
         {{>gridheader}}
         <div class="catalogue">
-            {{!-- <h1>Order List</h1> --}}
+            
+
             <table class="orders-table">
                 <thead>
                     <tr>
@@ -24,29 +28,34 @@
                         <th>Payment Status</th>
                         <th>Total</th>
                         <th>Items</th>
+                        <th>Shipping Rate</th>
+                        <th>Delivery Method</th>
                     </tr>
                 </thead>
                 <tbody id="orders-body">
                     {{#each initialOrders}}
-                    <tr class="orders-row">
-                        <td>{{orderNumber}}</td>
-                        <td>{{formatDate dateCreated}}</td>
-                        <td>{{totalOrderQuantity}}</td>
-                        <td>{{paymentMethod}}</td>
-                        <td>{{fulfillmentStatus}}</td>
-                        <td>{{paymentStatus}}</td>
-                        <td>{{total}}</td>
-                        <td>
-                            <ul>
-                                {{#each items}}
-                                    <li>{{this.itemName}} - {{this.quantity}} ({{this.variant}})</li>
-                                {{/each}}
-                            </ul>
-                        </td>
-                    </tr>
+                        <tr class="orders-row">
+                            <td>{{orderNumber}}</td>
+                            <td>{{formatDate dateCreated}}</td>
+                            <td>{{totalOrderQuantity}}</td>
+                            <td>{{paymentMethod}}</td>
+                            <td>{{fulfillmentStatus}}</td>
+                            <td>{{paymentStatus}}</td>
+                            <td>{{total}}</td>
+                            <td>
+                                <ul>
+                                    {{#each items}}
+                                        <li>{{this.itemName}} - {{this.quantity}} ({{this.variant}}), SKU: {{this.sku}}, Price: {{this.price}}</li>
+                                    {{/each}}
+                                </ul>
+                            </td>
+                            <td>{{shippingRate}}</td>
+                            <td>{{deliveryMethod}}</td>
+                        </tr>
                     {{/each}}
                 </tbody>
             </table>
+
             <div class="pagination-container">
                 <div class="pagination">
                     <button id="prev-button" style="display: none;">Previous</button>
@@ -56,11 +65,19 @@
                     <button id="next-button">Next</button>
                 </div>
             </div>
+
+            <div class="upload-container">
+                <form id="upload-form" enctype="multipart/form-data">
+                    <input type="file" id="csvFileInput" name="csvFile" accept=".csv">
+                    <button type="submit">Upload CSV</button>
+                </form>
+            </div>
+
         </div>
 
         <div id ="add-order-modal"class="modal">
             <div class="modal-content">
-               <div class="exit-button">
+                <div class="exit-button">
                     <img src="assets/back.png" alt="" class="exit">
                 </div>
                 
@@ -138,95 +155,96 @@
         </div>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const prevButton = document.getElementById('prev-button');
-            const nextButton = document.getElementById('next-button');
-            const pageNumber = document.getElementById('page-number');
-            const totalPages = parseInt(document.getElementById('total-pages').textContent);
 
-            const loadPage = async (page) => {
-                try {
-                    const response = await fetch(`/orders?page=${page}`, {
-                        headers: {
-                            'Accept': 'application/json'
-                        }
-                    });
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
+    document.addEventListener('DOMContentLoaded', () => {
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+        const pageNumber = document.getElementById('page-number');
+        let totalPages = parseInt(document.getElementById('total-pages').textContent);
+
+
+        const loadPage = async (page) => {
+            const target = document.body;
+            try {
+                const response = await fetch(`/orders?page=${page}`, {
+                    headers: {
+                        'Accept': 'application/json'
                     }
-                    const result = await response.json();
-                    const { orders } = result;
-                    const tbody = document.getElementById('orders-body');
-                    tbody.innerHTML = ''; 
-
-                    orders.forEach(order => {
-                        const orderNumber = order.orderNumber || 'N/A';
-                        const dateCreated = order.dateCreated ? new Date(order.dateCreated).toLocaleDateString() : 'N/A';
-                        const totalOrderQuantity = order.totalOrderQuantity || 'N/A';
-                        const paymentMethod = order.paymentMethod || 'N/A';
-                        const fulfillmentStatus = order.fulfillmentStatus || 'N/A';
-                        const paymentStatus = order.paymentStatus || 'N/A';
-                        const total = order.total || 'N/A';
-                        const items = order.items && Array.isArray(order.items)
-                            ? order.items.map(item => `<li>${item.itemName} - ${item.quantity} (${item.variant || 'No Variant'})</li>`).join('')
-                            : '<li>N/A</li>';
-
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td>${orderNumber}</td>
-                            <td>${dateCreated}</td>
-                            <td>${totalOrderQuantity}</td>
-                            <td>${paymentMethod}</td>
-                            <td>${fulfillmentStatus}</td>
-                            <td>${paymentStatus}</td>
-                            <td>${total}</td>
-                            <td>
-                                <ul>${items}</ul>
-                            </td>
-                        `;
-                        tbody.appendChild(tr);
-                        tr.addEventListener('click', () => {
-                            $.ajax({
-                                url: '/api/orders/' + orderNumber,
-                                type: 'GET',
-                                success: function(response) {
-                                    console.log(response);
-                                },
-                                error: function(error) {
-                                    console.error('Error fetching order:', error);
-                                }
-                            });
-                        });
-                        tr.style.cursor = 'pointer';
-                    });
-
-
-                    pageNumber.textContent = page;
-                    prevButton.style.display = page <= 1 ? 'none' : 'inline-block';
-                    nextButton.style.display = page >= totalPages ? 'none' : 'inline-block';
-                } catch (error) {
-                    console.error('Error fetching more orders:', error);
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
                 }
-            };
+                const result = await response.json();
+                const { orders } = result;
+                const tbody = document.getElementById('orders-body');
+                tbody.innerHTML = '';
+                orders.forEach(order => {
+                    const orderNumber = order.orderNumber || 'N/A';
+                    const dateCreated = order.dateCreated ? new Date(order.dateCreated).toLocaleDateString() : 'N/A';
+                    const totalOrderQuantity = order.totalOrderQuantity || 'N/A';
+                    const paymentMethod = order.paymentMethod || 'N/A';
+                    const fulfillmentStatus = order.fulfillmentStatus || 'N/A';
+                    const paymentStatus = order.paymentStatus || 'N/A';
+                    const total = order.total ? `₱${order.total}` : 'N/A';
+                    const shippingRate = order.shippingRate || 'N/A';
+                    const deliveryMethod = order.deliveryMethod || 'N/A';
+                    const items = order.items && Array.isArray(order.items)
+                        ? order.items.map((item, index) => `
+                            <b>Item Name:</b> ${item.itemName}<br>
+                            <b>SKU:</b> ${item.sku}<br>
+                            <b>Quantity:</b> ${item.quantity}<br>
+                            <b>Price:</b> ₱${item.price}<br>
+                        `).join('<br>')
+                        : 'No items';
 
-            
-
-
-            nextButton.addEventListener('click', () => {
-                const currentPage = parseInt(pageNumber.textContent);
-                if (currentPage < totalPages) {
-                    loadPage(currentPage + 1);
+                    const tr = document.createElement('tr');
+                    tr.classList.add('orders-row');
+                    tr.innerHTML = `
+                        <td>${orderNumber}</td>
+                        <td>${dateCreated}</td>
+                        <td>${totalOrderQuantity}</td>
+                        <td>${paymentMethod}</td>
+                        <td>${fulfillmentStatus}</td>
+                        <td>${paymentStatus}</td>
+                        <td>${total}</td>
+                        <td>${items}</td>
+                        <td>${shippingRate}</td>
+                        <td>${deliveryMethod}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                pageNumber.textContent = page;
+                if (page === 1) {
+                    prevButton.style.display = 'none';
+                } else {
+                    prevButton.style.display = 'inline';
                 }
-            });
-
-            prevButton.addEventListener('click', () => {
-                const currentPage = parseInt(pageNumber.textContent);
-                if (currentPage > 1) {
-                    loadPage(currentPage - 1);
+                if (page === totalPages) {
+                    nextButton.style.display = 'none';
+                } else {
+                    nextButton.style.display = 'inline';
                 }
-            });
+            } catch (error) {
+                console.error('Error loading page:', error);
+            }
+        };
 
-            loadPage(parseInt(pageNumber.textContent));
+        nextButton.addEventListener('click', () => {
+            const currentPage = parseInt(pageNumber.textContent);
+            if (currentPage < totalPages) {
+                loadPage(currentPage + 1);
+            }
+        });
+
+        prevButton.addEventListener('click', () => {
+            const currentPage = parseInt(pageNumber.textContent);
+            if (currentPage > 1) {
+                loadPage(currentPage - 1);
+            }
+        });
+
+        // Initial load
+        loadPage(1);
 
             // Modal functionality
             const modal = document.getElementById('add-order-modal');
@@ -246,7 +264,30 @@
                     modal.style.display = 'none';
                 }
             });
+
+            // Handle CSV upload
+            const uploadForm = document.getElementById('upload-form');
+            uploadForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const formData = new FormData(uploadForm);
+                try {
+                    const response = await fetch('/upload-csv', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const result = await response.json();
+                    console.log('CSV uploaded successfully:', result);
+                    // Optionally, reload the page or update the table to reflect new data
+                    window.location.reload();
+                } catch (error) {
+                    console.error('Error uploading CSV:', error);
+                }
+            });
         });
+
     </script>
 </body>
 </html>

@@ -4,7 +4,7 @@ const multer = require('multer');
 const Product = require('../models/Product');
 const { handleCollectionPageRequest, handleAddCollectionRequest, handleCollectionProductsRequest, checkCollectionName } = require('../controllers/collectionControllers');
 const { deleteProductById, checkName, checkSKU, fetchSizeStockCost, updateProduct, addProduct } = require('../controllers/productController');
-const { getOrders, getAnOrder } = require('../controllers/ordersController');
+const { uploadCSV, getOrders, getAnOrder, uploadCSVFile } = require('../controllers/ordersController');
 
 
 
@@ -27,9 +27,19 @@ const storageProductPicture = multer.diskStorage({
     }
 });
 
+// const storageCSV = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//       cb(null, 'src/models/data/');
+//   },
+//   filename: function (req, file, cb) {
+//       cb(null, file.originalname);
+//   }
+// });
+
 
 const uploadCollectionPicture = multer({ storage: storageCollectionPicture });
 const uploadProductPicture = multer({ storage: storageProductPicture });
+// const uploadCSV = multer({ storage: storageCSV });
 
 // collections page
 router.get(['/', '/collections'], handleCollectionPageRequest);
@@ -49,7 +59,7 @@ router.post('/api/products/add', uploadProductPicture.single('picture'), addProd
 // orders
 router.get('/orders', getOrders);
 router.get('/api/orders/:id', getAnOrder);
-
+router.post('/upload-csv', uploadCSV.single('csvFile'), uploadCSVFile);
 
 // testing
 router.get('/api/products/name/:name', async (req, res) => {
