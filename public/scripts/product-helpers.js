@@ -1,5 +1,3 @@
-
-
 let tagList, variations = [];
 let name, price, sku, materials, editingProductId, picture;
 
@@ -17,8 +15,6 @@ function deleteRow(event) {
     }
 
 }
-
-
 
 function popupClick(event){
     event.stopPropagation(); // do not bubble up to the DOM window
@@ -134,8 +130,6 @@ function validatePriceInput() {
 }
 
 
-
-
 function validateSKUInput() {
     if($(this).val() === "") {
         $('#product-sku-input').removeClass('correct-input').addClass('wrong-input');
@@ -157,6 +151,7 @@ function validateSKUInput() {
         });
     }
 }
+
 
 function editProduct() {
     event.preventDefault();

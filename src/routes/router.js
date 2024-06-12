@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const Product = require('../models/Product');
 const { handleCollectionPageRequest, handleAddCollectionRequest, handleCollectionProductsRequest, checkCollectionName } = require('../controllers/collectionControllers');
-const { deleteProductById, checkName, checkSKU, fetchSizeStockCost, updateProduct, addProduct } = require('../controllers/productController');
+const { fetchProductData, deleteProductById, checkName, checkSKU, fetchSizeStockCost, updateProduct, addProduct } = require('../controllers/productController');
 const { getOrders, getAnOrder } = require('../controllers/ordersController');
 
 
@@ -45,6 +45,7 @@ router.post('/api/products/check-sku', checkSKU);
 router.get('/products/:id', fetchSizeStockCost);
 router.post('/api/products/update/:id', uploadProductPicture.single('picture'), updateProduct);
 router.post('/api/products/add', uploadProductPicture.single('picture'), addProduct);
+router.get('/products/:id', fetchProductData); //exported
 
 // orders
 router.get('/orders', getOrders);

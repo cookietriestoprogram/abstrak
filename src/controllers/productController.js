@@ -1,9 +1,91 @@
-
-
-
 const Product = require('../models/Product');
 const AbstrakCol = require('../models/AbstrakCol');
 const { addProductToCollection } = require('./collectionControllers');
+
+async function fetchProductData(req, res) {
+    try {
+        const productId = req.params.id;
+
+        // Fetch product data
+        const product = await Product.findById(productId).lean();
+
+        // Fetch fulfilled orders
+        const fulfilledOrders = await Order.find({ fulfillmentStatus: 'Fulfilled' }).lean();
+
+        // Calculate totalQuantitySold and totalSalesAmount for each variation
+        product.variations.forEach(variation => {
+            variation.totalQuantitySold = 0;
+
+            fulfilledOrders.forEach(order => {
+                order.items.forEach(item => {
+                    if (item.productId.toString() === productId && item.variation === variation.variation) {
+                        variation.totalQuantitySold += item.quantity;
+                    }
+                });
+            });
+        });
+
+        res.json(product);
+    } catch (error) {
+        console.error('Error fetching product data:', error);
+        res.status(500).send('Internal Server Error');
+    }
+}
+    
+async function fetchProductData(req, res) {
+    try {
+        const productId = req.params.id;
+
+        // Fetch product data
+        const product = await Product.findById(productId).lean();
+
+        // Fetch fulfilled orders
+        const fulfilledOrders = await Order.find({ fulfillmentStatus: 'Fulfilled' }).lean();
+
+        // Initialize metrics
+        let totalQuantitySold = 0;
+        let totalSalesAmount = 0;
+        let totalCost = 0;
+
+        // Calculate metrics for the entire product
+        fulfilledOrders.forEach(order => {
+            order.items.forEach(item => {
+                if (item.productId.toString() === productId) {
+                    totalQuantitySold += item.quantity;
+                    totalSalesAmount += item.quantity * item.price;
+                    totalCost += item.quantity * product.costPrice; // Assuming product.costPrice exists
+                }
+            });
+        });
+
+        // Calculate gross profit and profit margin
+        const grossProfit = totalSalesAmount - totalCost;
+        const profitMargin = (grossProfit / totalSalesAmount) * 100;
+
+        // Prepare response object
+        const response = {
+            productId: product._id,
+            productName: product.name,
+            totalQuantitySold,
+            totalSalesAmount,
+            costPrice: product.costPrice, // Assuming product.costPrice exists
+            sellingPrice: product.price,
+            totalCost,
+            grossProfit,
+            profitMargin,
+            returnRate: product.returnRate, // Assuming product.returnRate exists
+            overallTrend: {
+                salesOverTime: [], // Placeholder for sales over time data
+                profitOverTime: [] // Placeholder for profit over time data
+            }
+        };
+
+        res.json(response);
+    } catch (error) {
+        console.error('Error fetching product data:', error);
+        res.status(500).send('Internal Server Error');
+    }
+}
 
 async function deleteProductById(req, res) {
     try {
@@ -130,8 +212,6 @@ async function updateProduct(req, res) {
   }
 }
 
-
-
 async function checkSKU(req, res) {
     const sku = req.body.sku;
 
@@ -153,4 +233,13 @@ async function checkSKU(req, res) {
 
 
 }
-module.exports = { deleteProductById, checkName, checkSKU, fetchSizeStockCost, updateProduct, addProduct };
+
+module.exports = {
+    fetchProductData,
+    deleteProductById,
+    checkName,
+    checkSKU,
+    fetchSizeStockCost,
+    updateProduct,
+    addProduct
+};

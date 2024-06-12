@@ -37,6 +37,68 @@
         </div>
     </div>    
 
+<div class="product-card-modal" style="display: none;">
+    <div class="product-card">
+        <div class="product-card-header">
+            <h2 class="product-name" id="dynamic-product-name">PRODUCT NAME</h2>
+            <span class="close-product-card" onclick="closeCard()">x</span>
+        </div>
+        <div class="product-card-content">
+            <div class="product-card-section active" id="section-1">
+                <div class="product-left">
+                    <div class="product-img-container">
+                        <img src="" alt="Product Image" class="product-img">
+                    </div>
+                    <div class="product-info">
+                        <p>Name: <span class="product-detail" id="product-name"></span></p>
+                        <p>Price: <span class="product-detail" id="product-price"></span></p>
+                        <p>SKU: <span class="product-detail" id="product-sku"></span></p>
+                        <p>Material: <span class="product-detail" id="product-material"></span></p>
+                    </div>
+                </div>
+                <div class="product-right">
+                    <div class="product-metrics">
+                        <div class="metric">
+                            <p>SOLD: <span id="sold"></span></p>
+                        </div>
+                        <div class="metric">
+                            <p>TOTAL SALES AMOUNT: <span id="total-sales-amount"></span></p>
+                        </div>
+                        <div class="metric">
+                            <p>COST PRICE: <span id="cost-price"></span></p>
+                        </div>
+                        <div class="metric">
+                            <p>TOTAL COST: <span id="total-cost"></span></p>
+                        </div>
+                        <div class="metric">
+                            <p>GROSS PROFIT: <span id="gross-profit"></span></p>
+                        </div>
+                        <div class="metric">
+                            <p>RETURN RATE: <span id="return-rate"></span></p>
+                        </div>
+                    </div>
+                    <div class="product-graphs">
+                        <div class="product-graph">
+                            <h4>Overall Trend</h4>
+                            <img src="" alt="Overall Trend Graph">
+                        </div>
+                        <div class="product-graph">
+                            <h4>Profit Margin</h4>
+                            <img src="" alt="Profit Margin Graph">
+                        </div>
+                    </div>
+                </div>
+                <button class="next-section" onclick="showSection(2)">Next (1/2)</button>
+            </div>
+            <div class="product-card-section" id="section-2">
+                <div class="product-variations"></div>
+                <div class="product-sales"></div> <!-- Add this container for sales data -->
+                <button class="previous-section" onclick="showSection(1)">Back (2/2)</button>
+            </div>
+        </div>
+    </div>
+</div>
+
     <div class="add-product-modal">
         <div class="add-product-form">
             <h1 class="add-product-title">Add Product</h1>
@@ -80,7 +142,7 @@
         $('.add-product-modal').hide();
 
         $(".edit-product-modal").hide();
-
+        $(".product-card-modal").hide();
         
         $(".form-2").hide();
 
