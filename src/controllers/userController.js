@@ -1,7 +1,32 @@
+const User = require('../models/User');
 
-const User = require('../models/userModel');
+async function viewDashboard(req, res) {
+    try {
+        const admins = await User.find({isAdmin : true}).lean();
+        const adminCount = admins.length;
+
+        const nonAdmins = await User.find({isAdmin : false}).lean();
+        const nonAdminCount = nonAdmins.length;
+        console.log(admins);
+        console.log(nonAdmins);
+        console.log("Admins: " + adminCount + " Non-admins: " + nonAdminCount);
 
 
-const mongoose = require('mongoose');
+        res.render('users', { adminCount, admins, nonAdminCount, nonAdmins });  // Pass the admins to the 'users' template
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Internal Server Error!");
+    }
+}
 
+async function calculateAdmin() {
 
+}
+
+async function calculateNonAdmin() {
+    
+}
+
+module.exports = {
+    viewDashboard
+}

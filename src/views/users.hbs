@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="/styles/users.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/scripts/users.js"></script>
+
+</head>
+
+<body>
+    <div class="main">
+        {{>navbar}}
+        <div class="container">
+            <div class="admin-panel panel">
+                <div class="label">
+                    <b><p>Admins <i>({{adminCount}})</i></p></b>
+                    <button class="add-button" id="add-admin-button">
+                        <img src="/assets/search.png" alt="Search Icon" class="search-icon">
+                        Add Admin
+                    </button>
+                </div>
+
+                <div class="users">
+                    {{#each admins}}
+                        {{>usercard}}
+                    {{/each}}
+                </div>
+            </div>
+
+            <div class="non-admin-panel panel">
+                <div class="label">
+                    <b><p>Non-admins <i>({{nonAdminCount}})</i></p></b>
+                    <button class="add-button" id="add-non-admin-button">
+                        <img src="/assets/search.png" alt="Search Icon" class="search-icon">
+                        Add Non-Admin
+                    </button>
+                </div>
+
+                <div class="users">
+                    <div class="card">
+                        {{#each nonAdmins}}
+                            {{>usercard}}
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

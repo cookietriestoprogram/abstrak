@@ -1,0 +1,72 @@
+[
+    {
+        "firstName": "Josh Denzel",
+        "lastName": "Ng",
+        "isAdmin": true,
+        "position": "CEO",
+        "phoneNumber": "+63917123456",
+        "password": "12345678",
+        "email": "random@gmail.com",
+        "profilePicture" : "upload-icon.png"
+    },
+    {
+        "firstName": "Leviathan",
+        "lastName": "Co",
+        "isAdmin": true,
+        "position": "CEO",
+        "phoneNumber": "+63917123456",
+        "password": "12345678",
+        "email": "random1@gmail.com",
+        "profilePicture" : "upload-icon.png"
+    },
+    {
+        "firstName": "Ken Ivan",
+        "lastName": "Cheng",
+        "isAdmin": false,
+        "position": "Developer",
+        "phoneNumber": "+63917123456",
+        "password": "12345678",
+        "email": "random2@gmail.com",
+        "profilePicture" : "upload-icon.png"
+    },
+    {
+        "firstName": "Joseph Dean",
+        "lastName": "Enriquez",
+        "isAdmin": false,
+        "position": "Developer",
+        "phoneNumber": "+63917123456",
+        "password": "12345678",
+        "email": "random3@gmail.com",
+        "profilePicture" : "upload-icon.png"
+    },
+    {
+        "firstName": "Roger",
+        "lastName": "Canayon",
+        "isAdmin": false,
+        "position": "Developer",
+        "phoneNumber": "+63917123456",
+        "password": "12345678",
+        "email": "random4@gmail.com",
+        "profilePicture" : "upload-icon.png"
+    },
+    {
+        "firstName": "China",
+        "lastName": "Ortiz",
+        "isAdmin": false,
+        "position": "Developer",
+        "phoneNumber": "+63917123456",
+        "password": "12345678",
+        "email": "random5@gmail.com",
+        "profilePicture" : "upload-icon.png"
+    },
+    {
+        "firstName": "Yuan",
+        "lastName": "Pangan",
+        "isAdmin": false,
+        "position": "Developer",
+        "phoneNumber": "+63917123456",
+        "password": "12345678",
+        "email": "random6@gmail.com",
+        "profilePicture" : "upload-icon.png"
+    }
+]

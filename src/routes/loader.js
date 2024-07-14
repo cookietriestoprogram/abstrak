@@ -1,5 +1,6 @@
 const Collection = require('../models/AbstrakCol');
 const Product = require('../models/Product');
+const User = require('../models/User');
 const OrderInfo = require('../models/OrderInfo');
 // const Sales = require('../models/Sales');
 const fs = require('fs');
@@ -8,6 +9,7 @@ const multer = require('multer');
 
 const collectionsJson = "src/models/data/data-abstrakcols.json";
 const productsJson = "src/models/data/data-products.json";
+const usersJson = "src/models/data/data-users.json";
 
 function parseJson(pathToJson) {
   return JSON.parse(fs.readFileSync(pathToJson));
@@ -18,6 +20,13 @@ async function loadCollections() {
   await Collection.deleteMany({}).then(() => {
     Collection.insertMany(result);
   });
+}
+
+async function loadUsers() {
+  const result = parseJson(usersJson);
+  await User.deleteMany({}).then(() => {
+    User.insertMany(result);
+  })
 }
 
 async function loadProducts() {
@@ -104,4 +113,4 @@ async function processCsvData(csvFilePath) {
 }
 
 
-module.exports = { loadCollections, loadProducts, processCsvData };
+module.exports = { loadCollections, loadUsers, loadProducts, processCsvData };

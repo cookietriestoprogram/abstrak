@@ -5,7 +5,7 @@ const Product = require('../models/Product');
 const { handleCollectionPageRequest, handleAddCollectionRequest, handleCollectionProductsRequest, checkCollectionName, handleAllProductsRequest } = require('../controllers/collectionControllers');
 const { fetchProductData, fetchProductMetrics, fetchProductGraphs, deleteProductById, checkName, checkSKU, fetchSizeStockCost, updateProduct, addProduct, getVariation } = require('../controllers/productController');
 const { uploadCSV, getOrders, getAnOrder, uploadCSVFile, addOrder, checkOrderNo } = require('../controllers/ordersController');
-
+const { viewDashboard } = require('../controllers/userController');
 
 
 const storageCollectionPicture = multer.diskStorage({
@@ -60,6 +60,9 @@ router.post('/orders/add', addOrder);
 router.post('/upload-csv', uploadCSV.single('csvFile'), uploadCSVFile);
 router.get('/orders/checkOrderNo', checkOrderNo);
 
+
+//users
+router.get('/users', viewDashboard);
 
 // testing
 router.get('/api/products/name/:name', async (req, res) => {

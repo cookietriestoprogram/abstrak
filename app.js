@@ -6,7 +6,7 @@ const express = require('express');
 
 const mongoConnector = require('./src/models/db.js');
 const router = require('./src/routes/router.js');
-const { loadCollections, loadProducts, processCsvData  } = require('./src/routes/loader.js');
+const { loadCollections, loadUsers, loadProducts, processCsvData  } = require('./src/routes/loader.js');
 
 const app = express();
 
@@ -27,6 +27,7 @@ const productsJson = "src/models/data/Orders.csv";
 async function initializeLoad(){
     await loadCollections();
     await loadProducts();
+    await loadUsers();
     await processCsvData(productsJson);
 }
 
