@@ -19,14 +19,6 @@ async function viewDashboard(req, res) {
     }
 }
 
-async function calculateAdmin() {
-
-}
-
-async function calculateNonAdmin() {
-    
-}
-
 module.exports = {
     viewDashboard
 }
