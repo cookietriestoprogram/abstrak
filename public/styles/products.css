@@ -398,7 +398,7 @@
     border-radius: 5px;
     width: 150px;
     position: absolute; /* Adjust based on your layout */
-    z-index: 2;
+    z-index: 1000;
 }
 
 .product-options-popup p {

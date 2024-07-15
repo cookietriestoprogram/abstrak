@@ -6,14 +6,6 @@ const { handleCollectionPageRequest, handleAddCollectionRequest, handleCollectio
 const { fetchProductData, fetchProductMetrics, fetchProductGraphs, deleteProductById, checkName, checkSKU, fetchSizeStockCost, updateProduct, addProduct, getVariation } = require('../controllers/productController');
 const { uploadCSV, getOrders, getAnOrder, uploadCSVFile, addOrder, checkOrderNo } = require('../controllers/ordersController');
 const { viewDashboard } = require('../controllers/userController');
-const { updateInventoryBasedOnFulfillmentStatus, uploadCSV, getOrders, getAnOrder, uploadCSVFile, addOrder, checkOrderNo } = require('../controllers/ordersController');
-const { getAllExpenses, addExpense, updateExpense, deleteExpense } = require('../controllers/expensesController');
-const { getVouchers } = require('../controllers/vouchersController');
-const { login, logout } = require('../controllers/loginController');
-const { isAuthenticated } = require('../middleware/authMiddleware');
-
-
-
 
 
 const storageCollectionPicture = multer.diskStorage({
@@ -38,29 +30,6 @@ const storageProductPicture = multer.diskStorage({
 
 const uploadCollectionPicture = multer({ storage: storageCollectionPicture });
 const uploadProductPicture = multer({ storage: storageProductPicture });
-
-
-// Apply isAuthenticated middleware to all routes except login and logout
-router.use((req, res, next) => {
-  if (req.path === '/login' || req.path === '/logout') {
-      return next();
-  }
-  return isAuthenticated(req, res, next);
-});
-
-
-//user login
-router.get('/login', (req, res) => {
-  
-  if(!req.session.userId){
-    res.render('login');
-  } else {
-    res.redirect('/collections');
-  }
-});
-router.post('/login', login);
-router.get('/logout', logout);
-
 
 // collections page
 router.get(['/', '/collections'], handleCollectionPageRequest);
@@ -90,16 +59,7 @@ router.get('/api/orders/:id', getAnOrder);
 router.post('/orders/add', addOrder);
 router.post('/upload-csv', uploadCSV.single('csvFile'), uploadCSVFile);
 router.get('/orders/checkOrderNo', checkOrderNo);
-router.get('/orders/updateStock', updateInventoryBasedOnFulfillmentStatus);
 
-// expenses
-router.get('/expenses', getAllExpenses);
-router.post('/api/expenses', addExpense);
-router.put('/api/expenses/:id', updateExpense);
-router.delete('/api/expenses/:id', deleteExpense);
-
-// vouchers
-router.get('/api/search-voucher', getVouchers);
 
 //users
 router.get('/users', viewDashboard);
