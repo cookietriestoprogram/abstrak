@@ -4,6 +4,8 @@ const multer = require('multer');
 const Product = require('../models/Product');
 const { handleCollectionPageRequest, handleAddCollectionRequest, handleCollectionProductsRequest, checkCollectionName, handleAllProductsRequest } = require('../controllers/collectionControllers');
 const { fetchProductData, fetchProductMetrics, fetchProductGraphs, deleteProductById, checkName, checkSKU, fetchSizeStockCost, updateProduct, addProduct, getVariation } = require('../controllers/productController');
+const { uploadCSV, getOrders, getAnOrder, uploadCSVFile, addOrder, checkOrderNo } = require('../controllers/ordersController');
+const { viewDashboard } = require('../controllers/userController');
 const { updateInventoryBasedOnFulfillmentStatus, uploadCSV, getOrders, getAnOrder, uploadCSVFile, addOrder, checkOrderNo } = require('../controllers/ordersController');
 const { getAllExpenses, addExpense, updateExpense, deleteExpense } = require('../controllers/expensesController');
 const { getVouchers } = require('../controllers/vouchersController');
@@ -98,6 +100,9 @@ router.delete('/api/expenses/:id', deleteExpense);
 
 // vouchers
 router.get('/api/search-voucher', getVouchers);
+
+//users
+router.get('/users', viewDashboard);
 
 // testing
 router.get('/api/products/name/:name', async (req, res) => {

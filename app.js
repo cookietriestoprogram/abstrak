@@ -9,6 +9,7 @@ const MemoryStore = require('memorystore')(session);
 
 const mongoConnector = require('./src/models/db.js');
 const router = require('./src/routes/router.js');
+
 const { loadCollections, loadProducts, loadUsers, processCsvData, loadVouchers  } = require('./src/routes/loader.js');
 
 const app = express();
