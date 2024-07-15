@@ -1,7 +1,27 @@
+const User = require('../models/User');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const User = require('./models/User'); // Adjust the path to your User model
 const users = require('./sampleUsers.json'); // Adjust the path to your JSON file
+
+async function viewDashboard(req, res) {
+    try {
+        const admins = await User.find({isAdmin : true}).lean();
+        const adminCount = admins.length;
+
+        const nonAdmins = await User.find({isAdmin : false}).lean();
+        const nonAdminCount = nonAdmins.length;
+        console.log(admins);
+        console.log(nonAdmins);
+        console.log("Admins: " + adminCount + " Non-admins: " + nonAdminCount);
+
+
+        res.render('users', { adminCount, admins, nonAdminCount, nonAdmins });  // Pass the admins to the 'users' template
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Internal Server Error!");
+    }
+}
+
 
 async function hashPassword(password) {
     const salt = await bcrypt.genSalt(10);
@@ -29,3 +49,8 @@ async function createUsers() {
 }
 
 createUsers();
+
+
+module.exports = {
+    viewDashboard
+}
