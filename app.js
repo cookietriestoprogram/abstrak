@@ -1,14 +1,30 @@
 // modules
 const _ = require('dotenv').config(); 
 const path = require('path');
+const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
 const exphbs = require('express-handlebars');
 const express = require('express');
+const session = require('express-session');
+const MemoryStore = require('memorystore')(session);
 
 const mongoConnector = require('./src/models/db.js');
 const router = require('./src/routes/router.js');
-const { loadCollections, loadUsers, loadProducts, processCsvData  } = require('./src/routes/loader.js');
+
+const { loadCollections, loadProducts, loadUsers, processCsvData, loadVouchers  } = require('./src/routes/loader.js');
 
 const app = express();
+
+function initializeSessionManagement(){
+    app.use(session({
+        cookie: { maxAge: 24 * 60 * 60 * 1000 },
+        store: new MemoryStore({
+          checkPeriod: 86400000 
+        }),
+        resave: false,
+        secret: 'keyboard cat',
+        saveUninitialized: true
+    }));
+}
 
 
 async function connectToDB (){
@@ -29,9 +45,12 @@ async function initializeLoad(){
     await loadProducts();
     await loadUsers();
     await processCsvData(productsJson);
+    await loadVouchers();
 }
 
 function initializeHandlebars() {
+    const { allowProtoMethodsByDefault, allowProtoPropertiesByDefault } = require('@handlebars/allow-prototype-access');
+    // const exphbs = require('express-handlebars');
     app.engine("hbs", exphbs.engine({
         extname: "hbs",
         defaultLayout: false,
@@ -52,6 +71,10 @@ function initializeHandlebars() {
             json: function(context) {
                 return JSON.stringify(context);
             }
+        },
+        runtimeOptions: {
+            allowProtoPropertiesByDefault: true,
+            allowProtoMethodsByDefault: true,
         }
     }));
     app.set("view engine", "hbs");
@@ -68,6 +91,7 @@ function initializeStaticFolders() {
 }
 
 async function main() {
+    initializeSessionManagement();
     initializeStaticFolders();
     initializeHandlebars();
 
