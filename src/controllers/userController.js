@@ -33,10 +33,10 @@ async function createUsers() {
 
 async function viewDashboard(req, res) {
     try {
-        const admins = await User.find({ role: 'admin'}).lean();
+        const admins = await User.find({ isAdmin: true }).lean();
         const adminCount = admins.length;
 
-        const nonAdmins = await User.find({ role: { $ne: 'admin'} }).lean();
+        const nonAdmins = await User.find({isAdmin: false }).lean();
         const nonAdminCount = nonAdmins.length;
         console.log(admins);
         console.log(nonAdmins);
