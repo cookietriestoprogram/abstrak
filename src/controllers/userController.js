@@ -38,12 +38,15 @@ async function viewDashboard(req, res) {
 
         const nonAdmins = await User.find({isAdmin: false }).lean();
         const nonAdminCount = nonAdmins.length;
+
+        
+
         console.log(admins);
         console.log(nonAdmins);
         console.log("Admins: " + adminCount + " Non-admins: " + nonAdminCount);
+        console.log(req.session.username + " | Admin: " + req.session.isAdmin);
 
-
-        res.render('users', { adminCount, admins, nonAdminCount, nonAdmins });  // Pass the admins to the 'users' template
+        res.render('users', { adminCount, admins, nonAdminCount, nonAdmins, checkAdmin: req.session.isAdmin });  // Pass the admins to the 'users' template
     } catch (err) {
         console.error(err);
         res.status(500).send("Internal Server Error!");
