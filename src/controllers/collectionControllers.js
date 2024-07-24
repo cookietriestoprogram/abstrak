@@ -1,6 +1,5 @@
 const Collection = require('../models/AbstrakCol');
 
-
 async function handleCollectionPageRequest (req, res) {
     try {
         const collections = await Collection.find({}).lean();
@@ -103,7 +102,8 @@ async function handleAllProductsRequest(req, res) {
     }
 }
 
-module.exports = {  handleCollectionPageRequest,
+module.exports = {  
+                    handleCollectionPageRequest,
                     handleAddCollectionRequest,
                     handleCollectionProductsRequest,
                     checkCollectionName,
