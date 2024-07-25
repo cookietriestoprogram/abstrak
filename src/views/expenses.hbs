@@ -9,6 +9,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
     <script src="/scripts/general.js"></script>
 </head>
 
@@ -19,10 +22,16 @@
             <div class="charts-section">
                 <h2>Charts</h2>
                 <div class="charts-container">
-                    <div class="chart-placeholder">chart...</div>
-                    <div class="chart-placeholder">chart...</div>
-                    <div class="chart-placeholder">chart...</div>
-                    <div class="chart-placeholder">chart...</div>
+                    <div class="chart-wrapper">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                    <div class="chart-wrapper">
+                        <div class="collection-chart-nav">
+                            <button id="prevCollection">Previous</button>
+                            <canvas id="collectionChart"></canvas>
+                            <button id="nextCollection">Next</button>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="recent-expenses">

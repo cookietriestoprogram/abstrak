@@ -5,7 +5,7 @@ const Product = require('../models/Product');
 const {  handleCollectionPageRequest, handleAddCollectionRequest, handleCollectionProductsRequest, checkCollectionName, handleAllProductsRequest } = require('../controllers/collectionControllers');
 const { fetchProductData, fetchProductMetrics, fetchProductGraphs, deleteProductById, checkName, checkSKU, fetchSizeStockCost, updateProduct, addProduct, getVariation, checkStock } = require('../controllers/productController');
 const { uploadCSV, getOrders, getAnOrder, uploadCSVFile, addOrder, checkOrderNo } = require('../controllers/ordersController');
-const { getAllCollections, getAllExpenses, getExpense, addExpense, updateExpense, deleteExpense } = require('../controllers/expensesController');
+const { getAllCollections, getAllExpenses, getExpense, addExpense, updateExpense, deleteExpense, fetchExpenseGraphs } = require('../controllers/expensesController');
 const { getVouchers } = require('../controllers/vouchersController');
 const { login, logout } = require('../controllers/loginController');
 const { isAuthenticated } = require('../middleware/authMiddleware');
@@ -115,6 +115,7 @@ router.get('/api/expenses/:id',getExpense);
 router.post('/api/expenses', addExpense);
 router.put('/api/expenses/:id', updateExpense);
 router.delete('/api/expenses/:id', deleteExpense);
+router.get('/api/expense-graphs', fetchExpenseGraphs); // Add this route
 
 // vouchers
 router.get('/api/search-voucher', getVouchers);

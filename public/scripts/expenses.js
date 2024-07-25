@@ -3,6 +3,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const addBtn = document.getElementById("add-expense-btn");
     const closeBtn = document.getElementsByClassName("close")[0];
     const form = document.getElementById("expense-form");
+    
+    let categoryChart;
+    let collectionData = [];
+    let currentCollectionIndex = 0;
 
     const openModal = () => {
         console.log('Opening modal');
@@ -133,38 +137,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     };
-    
-
-    // Function to populate the form with expense details
-    const populateForm = async (expense) => {
-        console.log('Populating form with data:', expense);
-        await fetchCollections(); // Ensure collections are fetched before populating the form
-        $('#expense-id').val(expense._id);
-        $('#name').val(expense.name).removeClass('correct-input wrong-input');
-        $('#collection').val(expense.collectionName).removeClass('correct-input wrong-input');
-        $('#date').val(new Date(expense.date).toISOString().split('T')[0]).removeClass('correct-input wrong-input');
-        $('#amount').val(expense.amount).removeClass('correct-input wrong-input');
-        $('#quantity').val(expense.quantity).removeClass('correct-input wrong-input');
-        $('#payment-method').val(expense.paymentMethod).removeClass('correct-input wrong-input');
-        $('#category').val(expense.category).removeClass('correct-input wrong-input');
-        $('#description').val(expense.description).removeClass('correct-input wrong-input');
-        $('#receipt-url').val(expense.receiptUrl).removeClass('correct-input wrong-input');
-
-        // Update modal title
-        $('#modal-title').text('Edit Expense');
-    };
-
-    // Attach event listeners to edit buttons
-    document.querySelectorAll('.edit-btn').forEach(button => {
-        button.addEventListener('click', (event) => {
-            event.preventDefault();
-            const expenseId = event.target.dataset.id;
-            console.log(`Edit button clicked for expense ID: ${expenseId}`);
-            document.getElementById("modal-title").innerText = "Edit Expense";
-            openModal();
-            fetchExpenseDetails(expenseId);
-        });
-    });
 
     document.querySelectorAll('.delete-btn').forEach(button => {
         button.addEventListener('click', (event) => {
@@ -212,7 +184,217 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     });
+    
+    // Function to populate the form with expense details
+    const populateForm = async (expense) => {
+        console.log('Populating form with data:', expense);
+        await fetchCollections(); // Ensure collections are fetched before populating the form
+        $('#expense-id').val(expense._id);
+        $('#name').val(expense.name).removeClass('correct-input wrong-input');
+        $('#collection').val(expense.collectionName).removeClass('correct-input wrong-input');
+        $('#date').val(new Date(expense.date).toISOString().split('T')[0]).removeClass('correct-input wrong-input');
+        $('#amount').val(expense.amount).removeClass('correct-input wrong-input');
+        $('#quantity').val(expense.quantity).removeClass('correct-input wrong-input');
+        $('#payment-method').val(expense.paymentMethod).removeClass('correct-input wrong-input');
+        $('#category').val(expense.category).removeClass('correct-input wrong-input');
+        $('#description').val(expense.description).removeClass('correct-input wrong-input');
+        $('#receipt-url').val(expense.receiptUrl).removeClass('correct-input wrong-input');
 
-    // Fetch collections on page load
-    fetchCollections();
+        // Update modal title
+        $('#modal-title').text('Edit Expense');
+    };
+
+    // Attach event listeners to edit buttons
+    document.querySelectorAll('.edit-btn').forEach(button => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+            const expenseId = event.target.dataset.id;
+            console.log(`Edit button clicked for expense ID: ${expenseId}`);
+            document.getElementById("modal-title").innerText = "Edit Expense";
+            openModal();
+            fetchExpenseDetails(expenseId);
+        });
+    });
+
+    function fetchExpenseGraphs() {
+        $.ajax({
+            url: '/api/expense-graphs',
+            method: 'GET',
+            success: function(response) {
+                console.log('Expense graphs data fetched:', response);
+                var expenseAggregations = response.expenseAggregations;
+                var collectionAggregations = response.collectionAggregations;
+
+                var categoryData = calculateCategoryData(expenseAggregations);
+                var collectionData = calculateCollectionData(collectionAggregations);
+
+                console.log('Category Data:', categoryData);
+                console.log('Collection Data:', collectionData);
+
+                createCategoryPieChart(categoryData);
+                createCollectionBarChart(collectionData);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching expense graphs:", error);
+            }
+        });
+    }
+    
+    function calculateCategoryData(expenseAggregations) {
+        const labels = expenseAggregations.map(data => data.category);
+        const data = expenseAggregations.map(data => data.totalAmount);
+
+        return { labels, data };
+    }
+    
+    function calculateCollectionData(collectionAggregations) {
+        const collections = [...new Set(collectionAggregations.map(data => data.collectionName))];
+        const datasets = collections.map(collection => {
+            const data = collectionAggregations.filter(item => item.collectionName === collection)
+                                                .map(item => item.totalAmount);
+            const labels = collectionAggregations.filter(item => item.collectionName === collection)
+                                                 .map(item => item.category);
+            return { collection, labels, data };
+        });
+
+        return datasets;
+    }
+
+    
+        function createCategoryPieChart(categoryData) {
+            var categoryChartCtx = document.getElementById('categoryChart').getContext('2d');
+
+    
+            categoryChart = new Chart(categoryChartCtx, {
+                type: 'pie',
+                data: {
+                    labels: categoryData.labels,
+                    datasets: [{
+                        data: categoryData.data,
+                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    var label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += context.raw.toLocaleString();
+                                    return label;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: '#fff',
+                            font: {
+                                size: 10
+                            },
+                            formatter: (value, context) => {
+                                let sum = 0;
+                                let dataArr = context.chart.data.datasets[0].data;
+                                dataArr.map(data => {
+                                    sum += data;
+                                });
+                                let percentage = (value * 100 / sum).toFixed(2) + "%";
+                                return percentage;
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+    
+            console.log('Category chart created:', categoryChart);
+        }
+    
+        function createCollectionBarChart(data) {
+            collectionData = data;
+            var collectionChartCtx = document.getElementById('collectionChart').getContext('2d');
+
+            collectionChart = new Chart(collectionChartCtx, {
+                type: 'bar',
+                data: {
+                    labels: collectionData[currentCollectionIndex].labels,
+                    datasets: [{
+                        label: collectionData[currentCollectionIndex].collection,
+                        data: collectionData[currentCollectionIndex].data,
+                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            stacked: true
+                        },
+                        y: {
+                            stacked: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    var label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += context.raw.toLocaleString();
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        
+            console.log('Collection chart created:', collectionChart);
+        }
+    
+        function updateCollectionBarChart(index) {
+            const data = collectionData[index];
+            window.collectionChart.data.labels = data.labels;
+            window.collectionChart.data.datasets[0].label = data.collection;
+            window.collectionChart.data.datasets[0].data = data.data;
+            window.collectionChart.update();
+        }
+        
+    
+        document.getElementById('prevCollection').addEventListener('click', () => {
+            currentCollectionIndex = (currentCollectionIndex - 1 + collectionData.length) % collectionData.length;
+            updateCollectionBarChart(currentCollectionIndex);
+        });
+        
+        document.getElementById('nextCollection').addEventListener('click', () => {
+            currentCollectionIndex = (currentCollectionIndex + 1) % collectionData.length;
+            updateCollectionBarChart(currentCollectionIndex);
+        });
+        
+      
+     // Fetch expense graphs on page load
+    fetchExpenseGraphs();
 });
+    
