@@ -9,7 +9,7 @@ const { getAllExpenses, addExpense, updateExpense, deleteExpense } = require('..
 const { getVouchers } = require('../controllers/vouchersController');
 const { login, logout } = require('../controllers/loginController');
 const { isAuthenticated } = require('../middleware/authMiddleware');
-const { viewDashboard, updateProfile, getProfile } = require('../controllers/userController');
+const { viewDashboard, updateProfile, getProfile, createUser } = require('../controllers/userController');
 
 
 
@@ -107,6 +107,7 @@ router.get('/orders/checkOrderNo', checkOrderNo);
 
 //users
 router.get('/users', viewDashboard);
+router.post('/api/users/add', uploadCollectionPicture.single('profilePicture'), createUser)
 
 // expenses
 router.get('/expenses', getAllExpenses);

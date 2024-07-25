@@ -148,6 +148,10 @@
     display: none;
 }
 
+.user-photo {
+    object-fit:contain;
+}
+
 .submit-user-button {
     width: 20%;
     height: 40px;

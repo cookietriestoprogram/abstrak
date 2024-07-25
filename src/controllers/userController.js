@@ -30,6 +30,30 @@ async function createUsers() {
 }
 */
 
+async function createUser(req, res) {
+    try {
+        const { firstName, lastName, password, confirmPassword, email, username } = req.body
+        const profilePicture = req.file || { filename: 'default.jpg' }
+
+        if (password === confirmPassword) {
+            const newUser = new User({
+                firstName,
+                lastName,
+                password,
+                email,
+                username,
+                profilePicture
+            })
+            console.log("HI " + newUser);
+            newUser.save();
+            res.send({success: true, message: 'User successfully created!'})
+        }
+
+        
+    } catch (error) {
+        console.error('Error creating user:', error);
+    }
+}
 
 async function viewDashboard(req, res) {
     try {
@@ -45,7 +69,6 @@ async function viewDashboard(req, res) {
         console.log(nonAdmins);
         console.log("Admins: " + adminCount + " Non-admins: " + nonAdminCount);
         const checkAdmin = await User.findOne({username: req.session.username}).lean();
-        console.log(checkAdmin.username + checkAdmin.role == 'admin')
 
         res.render('users', { adminCount, admins, nonAdminCount, nonAdmins, checkAdmin: checkAdmin.role == 'admin'});  // Pass the admins to the 'users' template
     } catch (err) {
@@ -116,5 +139,6 @@ async function updateProfile(req, res) {
 module.exports = {
     viewDashboard,
     getProfile,
-    updateProfile
+    updateProfile,
+    createUser
 }

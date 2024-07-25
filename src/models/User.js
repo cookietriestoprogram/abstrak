@@ -9,7 +9,7 @@ const userSchema = new Schema({
     profilePicture: { type: String },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
-    bio: { type: String },
+    bio: { type: String, default: "" },
     role: { type: String, enum: ['admin', 'editor', 'user'], default: 'user' }
 }, {
     timestamps: true // Automatically manage createdAt and updatedAt fields
