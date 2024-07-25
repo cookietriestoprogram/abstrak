@@ -9,8 +9,7 @@
     "firstName": "Max Emilian",
     "lastName": "Verstappen",
     "bio": "",
-    "isAdmin": false,
-    "role": "Logistics",
+    "role": "editor",
     "createdAt": "2023-07-01T00:00:00.000Z",
     "updatedAt": "2023-07-01T00:00:00.000Z"
   },
@@ -24,8 +23,7 @@
     "firstName": "Lewis",
     "lastName": "Hamilton",
     "bio": "",
-    "isAdmin": true,
-    "role": "CEO",
+    "role": "admin",
     "createdAt": "2023-07-01T00:00:00.000Z",
     "updatedAt": "2023-07-01T00:00:00.000Z"
   },
@@ -39,8 +37,7 @@
     "firstName": "Charles",
     "lastName": "Leclerc",
     "bio": "",
-    "isAdmin": false,
-    "role": "Finance",
+    "role": "user",
     "createdAt": "2023-07-01T00:00:00.000Z",
     "updatedAt": "2023-07-01T00:00:00.000Z"
   },
@@ -54,8 +51,7 @@
     "firstName": "Sebastian",
     "lastName": "Vettel",
     "bio": "",
-    "isAdmin": true,
-    "role": "CTO",
+    "role": "user",
     "createdAt": "2023-07-01T00:00:00.000Z",
     "updatedAt": "2023-07-01T00:00:00.000Z"
   }

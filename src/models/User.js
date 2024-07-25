@@ -10,8 +10,7 @@ const userSchema = new Schema({
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
     bio: { type: String },
-    isAdmin: {type: Boolean, default: false},
-    role: { type: String, enum: ['CEO', 'CTO', 'COO', 'CFO', 'Logistics', 'Finance', 'User'], default: 'User' }
+    role: { type: String, enum: ['admin', 'editor', 'user'], default: 'user' }
 }, {
     timestamps: true // Automatically manage createdAt and updatedAt fields
 });

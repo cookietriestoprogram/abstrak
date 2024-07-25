@@ -8,6 +8,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="../scripts/users.js"></script>
 
     </head>
 
@@ -73,8 +74,8 @@
                         <input type="password" name="" placeholder="Confirm Password" id="password-confirmation" class="text-input" required>
                         <input type="text" name="" placeholder="Email" id="email-input" class="text-input" required>
                         <select name="role" id="role-input" class="user-detail-input" required>
-                            <option value="ceo">CEO</option>
-                            <option value="logistics">Logistics</option>
+                            <option value="admin">Admin</option>
+                            <option value="editor">Editor</option>
                             <option value="user">User</option>
                         </select>
                     </div>
@@ -91,6 +92,7 @@
     </body>
 
     <script>
+        $(".add-user-modal").hide();
     </script>
 
 </html>

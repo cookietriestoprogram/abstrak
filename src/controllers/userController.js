@@ -33,10 +33,10 @@ async function createUsers() {
 
 async function viewDashboard(req, res) {
     try {
-        const admins = await User.find({ isAdmin: true }).lean();
+        const admins = await User.find({ role: 'admin' }).lean();
         const adminCount = admins.length;
 
-        const nonAdmins = await User.find({isAdmin: false }).lean();
+        const nonAdmins = await User.find({ role: { $ne: 'admin' } }).lean();
         const nonAdminCount = nonAdmins.length;
 
         
@@ -44,9 +44,10 @@ async function viewDashboard(req, res) {
         console.log(admins);
         console.log(nonAdmins);
         console.log("Admins: " + adminCount + " Non-admins: " + nonAdminCount);
-        console.log(req.session.username + " | Admin: " + req.session.isAdmin);
+        const checkAdmin = await User.findOne({username: req.session.username}).lean();
+        console.log(checkAdmin.username + checkAdmin.role == 'admin')
 
-        res.render('users', { adminCount, admins, nonAdminCount, nonAdmins, checkAdmin: req.session.isAdmin });  // Pass the admins to the 'users' template
+        res.render('users', { adminCount, admins, nonAdminCount, nonAdmins, checkAdmin: checkAdmin.role == 'admin'});  // Pass the admins to the 'users' template
     } catch (err) {
         console.error(err);
         res.status(500).send("Internal Server Error!");
