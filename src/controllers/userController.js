@@ -30,27 +30,29 @@ async function createUsers() {
 }
 */
 
+async function checkExistingUser(res, req) {
+
+}
+
 async function createUser(req, res) {
     try {
-        const { firstName, lastName, password, confirmPassword, email, username } = req.body
-        const profilePicture = req.file || { filename: 'default.jpg' }
+        const { firstName, lastName, password, confirmPassword, email, username } = req.body;
 
-        
         const newUser = new User({
             firstName,
             lastName,
             password,
             email,
             username,
-            profilePicture
+            profilePicture: req.file.filename
         })
 
         console.log(newUser);
-        newUser.save();
-        res.send({success: true, message: 'User successfully created!'})
+        await newUser.save();
+        res.send({ success: true, message: 'User successfully created!'})
     } catch (err) {
         console.log(err);
-        res.status(500).send("Internal server error!");
+        res.status(500).send("Internal Server Error");
     }
 }
 

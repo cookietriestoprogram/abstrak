@@ -38,14 +38,17 @@ $(document).ready(function(){
     });
 
     $(".submit-user-button").click(function(){
-        var firstName = $("#first-name-input").val();
-        var lastName = $("#last-name-input").val();
-        var password = $("#password-input").val();
+        
+        var firstName = $("#firstName-input").val();
+        var lastName = $("#lastName-input").val();
+        var password = $("#password").val();
         var confirmPassword = $("#password-confirmation").val();
         var email = $("#email-input").val();
-        var username = $("#username-input").val();
+        var username = $("#username").val();
         var image = $("#imageInput")[0].files[0];
+        
         var formData = new FormData();
+        
         formData.append("firstName", firstName);
         formData.append("lastName", lastName);
         formData.append("password", password);
@@ -60,8 +63,7 @@ $(document).ready(function(){
             contentType: false,
             processData: false,
             success: function(data){
-                if(data.success)
-                    location.reload();
+                window.location.reload();
             }
         });
     });
