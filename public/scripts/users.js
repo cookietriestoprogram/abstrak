@@ -39,50 +39,56 @@ $(document).ready(function(){
 
     $(".submit-user-button").click(function(){
         
-        var firstName = $("#firstName-input").val();
-        var lastName = $("#lastName-input").val();
-        var password = $("#password").val();
-        var confirmPassword = $("#password-confirmation").val();
-        var email = $("#email-input").val();
-        var username = $("#username").val();
-        var image = $("#imageInput")[0].files[0];
+        if(checkPassword()) {
+            var firstName = $("#firstName-input").val();
+            var lastName = $("#lastName-input").val();
+            var password = $("#password").val();
+            var confirmPassword = $("#password-confirmation").val();
+            var email = $("#email-input").val();
+            var username = $("#username").val();
+            var image = $("#imageInput")[0].files[0];
+            
+            var formData = new FormData();
+            
+            formData.append("firstName", firstName);
+            formData.append("lastName", lastName);
+            formData.append("password", password);
+            formData.append("confirmPassword", confirmPassword);
+            formData.append("email", email);
+            formData.append("username", username);
+            formData.append("profilePicture", image);
+            $.ajax({
+                url: "/api/users/add",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(data){
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'User Created',
+                        text: 'The user has been created successfully.',
+                        showConfirmButton: false // Hide the default "OK" button
+                    });
         
-        var formData = new FormData();
-        
-        formData.append("firstName", firstName);
-        formData.append("lastName", lastName);
-        formData.append("password", password);
-        formData.append("confirmPassword", confirmPassword);
-        formData.append("email", email);
-        formData.append("username", username);
-        formData.append("profilePicture", image);
-        $.ajax({
-            url: "/api/users/add",
-            type: "POST",
-            data: formData,
-            contentType: false,
-            processData: false,
-            success: function(data){
-                Swal.fire({
-                    icon: 'success',
-                    title: 'User Created',
-                    text: 'The user has been created successfully.',
-                    showConfirmButton: false // Hide the default "OK" button
-                });
-    
-                // Close the modal after 3 seconds (for example)
-                setTimeout(() => {
-                    Swal.close(); 
-                    window.location.reload();
-                }, 1500);
-            },
-            error: function(xhr, status, error) {
-                Swal.fire('Error', 'There was an error creating the user.', 'error');
-            }
-        });
+                    // Close the modal after 3 seconds (for example)
+                    setTimeout(() => {
+                        Swal.close(); 
+                        window.location.reload();
+                    }, 1500);
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire('Error', 'There was an error creating the user.', 'error');
+                }
+            });
+        } else {
+            Swal.fire('Error', 'Password does not match!');
+        }
     });
 
     $('.text-input').on('keyup', validateField);
+
+    $('#password-confirmation').on('keyup', checkPassword);
 });
 
 // Helper functions
@@ -91,5 +97,19 @@ function validateField(){
         $(this).removeClass('correct-input').addClass('wrong-input');
     } else {
         $(this).removeClass('wrong-input').addClass('correct-input');
+    }
+}
+function checkPassword() {
+    const password = $('#password').val();
+    const confirmation = $('#password-confirmation').val();
+
+    if (password === confirmation) {
+        $('#password').removeClass('wrong-input').addClass('correct-input');
+        $('#password-confirmation').removeClass('wrong-input').addClass('correct-input');
+        return true;
+    } else {
+        $('#password').removeClass('correct-input').addClass('wrong-input');
+        $('#password-confirmation').removeClass('correct-input').addClass('wrong-input');
+        return false;
     }
 }
