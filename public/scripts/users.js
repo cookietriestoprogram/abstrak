@@ -1,10 +1,21 @@
 $(document).ready(function(){
     $(".exit").click(function(event){
         $(".add-user-modal").hide();
+        $(".admin-roles").hide();
+        $(".non-admin-roles").hide();
     });
 
-    $(".add-button").click(function(event){
+    $("#add-admin-button").click(function(event){
         $(".add-user-modal").show();
+        $(".admin-roles").show();
+        document.querySelector(".admin-roles").selected = true;
+    })
+
+    $("#add-non-admin-button").click(function(event){
+        $(".add-user-modal").show();
+        $(".non-admin-roles").show();
+        
+        document.querySelector(".non-admin-roles").selected = true;
     })
 
     $(".main-picture").click(function(event){
