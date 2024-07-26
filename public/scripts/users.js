@@ -48,9 +48,70 @@ $(document).ready(function(){
         reader.readAsDataURL(file);
     });
 
+    $("#email-input").keyup(function(event){
+        $.ajax({
+            url: "/api/users/checkEmail",
+            type: "POST",
+            data: {email: $(this).val()},
+            success: function(data){
+                if (data.success) {
+                    $("#email-input").removeClass("wrong-input unavailable");
+                    $("#email-input").addClass("correct-input available");
+                    console.log("hi");
+                }
+                else {
+                    $("#email-input").removeClass("correct-input available");
+                    $("#email-input").addClass("wrong-input unavailable");
+                }
+            }
+        });
+    });
+
+    $("#username").keyup(function(event){
+        $.ajax({
+            url: "/api/users/checkUsername",
+            type: "POST",
+            data: {username: $(this).val()},
+            success: function(data){
+                if (data.success) {
+                    $("#username").removeClass("wrong-input unavailable");
+                    $("#username").addClass("correct-input available");
+                }
+                else {
+                    $("#username").removeClass("correct-input available");
+                    $("#username").addClass("wrong-input unavailable");
+                }
+            }
+        });
+    });
+
     $(".submit-user-button").click(function(){
+        const $textInputs = $('.text-input');
+
+        let filled = true; // Assume they all have values initially
+
+        $textInputs.each(function() {
+            const inputValue = $(this).val().trim(); // Get the trimmed value
+            if (inputValue === '') {
+                filled = false; // At least one input is empty
+                return; // Exit the loop early
+            }
+        });
         
-        if(checkPassword()) {
+        if(!filled) {
+            //If there is a field left blank, shoot an error message.
+            Swal.fire('Error', 'Please don\'t leave any blank fields.', 'error');
+        } else if(!checkPassword()) {
+            //If password and password confirmation don't match, shoot an error message.
+            Swal.fire('Error', 'Password does not match!', 'error');
+        } else if($("#email-input").hasClass("unavailable")) {
+            //If email is already taken, shoot an error message.
+            Swal.fire('Error', 'Email is already taken!', 'error');
+        } else if($("#username").hasClass("unavailable")) {
+            //If username is already taken, shoot an error message.
+            Swal.fire('Error', 'Username is already taken!', 'error');
+        }
+        else { //No errors. Should lead to a successful user creation.
             var firstName = $("#firstName-input").val();
             var lastName = $("#lastName-input").val();
             var password = $("#password").val();
@@ -94,8 +155,6 @@ $(document).ready(function(){
                     Swal.fire('Error', 'There was an error creating the user.', 'error');
                 }
             });
-        } else {
-            Swal.fire('Error', 'Password does not match!');
         }
     });
 

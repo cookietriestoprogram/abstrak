@@ -30,8 +30,31 @@ async function createUsers() {
 }
 */
 
-async function checkExistingUser(res, req) {
+async function checkExistingEmail(req, res) {
+    const email = req.body.email;
 
+    console.log(req.body.email);
+
+    User.findOne({email: email}).then(user =>{
+        if(user){
+            console.log("Email taken.");
+            res.send({ success: false, message: 'Email is already in use.'});
+        } else {
+            res.send({ success: true, message: 'Email is available.'})
+        }
+    })
+}
+
+async function checkExistingUsername(req, res) {
+    const username = req.body.username;
+
+    User.findOne({username: username}).then(user =>{
+        if(user){
+            res.send({ success: false, message: 'Username is already in use.'});
+        } else {
+            res.send({ success: true, message: 'Username is available.'})
+        }
+    })
 }
 
 async function createUser(req, res) {
@@ -142,5 +165,7 @@ module.exports = {
     viewDashboard,
     getProfile,
     updateProfile,
-    createUser
+    createUser,
+    checkExistingEmail,
+    checkExistingUsername
 }
