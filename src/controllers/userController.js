@@ -35,23 +35,22 @@ async function createUser(req, res) {
         const { firstName, lastName, password, confirmPassword, email, username } = req.body
         const profilePicture = req.file || { filename: 'default.jpg' }
 
-        if (password === confirmPassword) {
-            const newUser = new User({
-                firstName,
-                lastName,
-                password,
-                email,
-                username,
-                profilePicture
-            })
-            console.log("HI " + newUser);
-            newUser.save();
-            res.send({success: true, message: 'User successfully created!'})
-        }
-
         
-    } catch (error) {
-        console.error('Error creating user:', error);
+        const newUser = new User({
+            firstName,
+            lastName,
+            password,
+            email,
+            username,
+            profilePicture
+        })
+
+        console.log(newUser);
+        newUser.save();
+        res.send({success: true, message: 'User successfully created!'})
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Internal server error!");
     }
 }
 

@@ -38,13 +38,13 @@ $(document).ready(function(){
     });
 
     $(".submit-user-button").click(function(){
-        var firstName = $("#first-name-input").val();
-        var lastName = $("#last-description-input").val();
-        var password = $("#password-input").val();
+        var firstName = JSON.parse($("#first-name-input").val());
+        var lastName = JSON.parse($("#last-name-input").val());
+        var password = JSON.parse($("#password-input").val());
         var confirmPassword = $("#password-confirmation").val();
         var email = $("#email-input").val();
         var username = $("#username-input").val();
-        var image = $("#imageInput")[0].files[0];
+        var image = JSON.stringify($("#imageInput")[0].files[0]);
         var formData = new FormData();
         formData.append("firstName", firstName);
         formData.append("lastName", lastName);
@@ -61,8 +61,19 @@ $(document).ready(function(){
             processData: false,
             success: function(data){
                 if(data.success)
-                    window.location.href = "/users";
+                    location.reload();
             }
         });
     });
+
+    $('.text-input').on('keyup', validateField);
 });
+
+// Helper functions
+function validateField(){
+    if($(this).val() === "") {
+        $(this).removeClass('correct-input').addClass('wrong-input');
+    } else {
+        $(this).removeClass('wrong-input').addClass('correct-input');
+    }
+}

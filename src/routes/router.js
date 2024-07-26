@@ -107,7 +107,7 @@ router.get('/orders/checkOrderNo', checkOrderNo);
 
 //users
 router.get('/users', viewDashboard);
-router.post('/api/users/add', uploadCollectionPicture.single('profilePicture'), createUser)
+router.post('/api/users/add', uploadProfilePicture.single('profilePicture'), createUser)
 
 // expenses
 router.get('/expenses', getAllExpenses);
