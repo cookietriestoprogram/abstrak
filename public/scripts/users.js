@@ -63,7 +63,21 @@ $(document).ready(function(){
             contentType: false,
             processData: false,
             success: function(data){
-                window.location.reload();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'User Created',
+                    text: 'The user has been created successfully.',
+                    showConfirmButton: false // Hide the default "OK" button
+                });
+    
+                // Close the modal after 3 seconds (for example)
+                setTimeout(() => {
+                    Swal.close(); 
+                    window.location.reload();
+                }, 1500);
+            },
+            error: function(xhr, status, error) {
+                Swal.fire('Error', 'There was an error creating the user.', 'error');
             }
         });
     });

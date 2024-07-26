@@ -2,6 +2,7 @@
 @import "navbar.css";
 @import "gridheader.css";
 @import "usercard.css";
+@import "swal.css";
 
 .main {
     height: 100%;
