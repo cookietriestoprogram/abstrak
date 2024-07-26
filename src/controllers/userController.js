@@ -36,7 +36,7 @@ async function checkExistingUser(res, req) {
 
 async function createUser(req, res) {
     try {
-        const { firstName, lastName, password, confirmPassword, email, username } = req.body;
+        const { firstName, lastName, password, email, username, role } = req.body;
 
         const newUser = new User({
             firstName,
@@ -44,6 +44,7 @@ async function createUser(req, res) {
             password,
             email,
             username,
+            role,
             profilePicture: req.file || 'default.jpg'
         })
 
