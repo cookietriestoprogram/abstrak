@@ -38,13 +38,13 @@ $(document).ready(function(){
     });
 
     $(".submit-user-button").click(function(){
-        var firstName = JSON.parse($("#first-name-input").val());
-        var lastName = JSON.parse($("#last-name-input").val());
-        var password = JSON.parse($("#password-input").val());
+        var firstName = $("#first-name-input").val();
+        var lastName = $("#last-name-input").val();
+        var password = $("#password-input").val();
         var confirmPassword = $("#password-confirmation").val();
         var email = $("#email-input").val();
         var username = $("#username-input").val();
-        var image = JSON.stringify($("#imageInput")[0].files[0]);
+        var image = $("#imageInput")[0].files[0];
         var formData = new FormData();
         formData.append("firstName", firstName);
         formData.append("lastName", lastName);
